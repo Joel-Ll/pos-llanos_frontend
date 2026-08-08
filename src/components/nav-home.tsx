@@ -1,18 +1,23 @@
-import { Link } from "react-router"
-import { useSidebarStore } from "@/store/sidebar.store"
-import type { LucideIcon } from "lucide-react"
-import { SidebarGroup, SidebarGroupContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "./ui/sidebar"
-
+import { Link } from "react-router";
+import { useSidebarStore } from "@/store/sidebar.store";
+import type { LucideIcon } from "lucide-react";
+import {
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+} from "./ui/sidebar";
 
 type TNavHome = {
-  title: string,
-  url: string,
-  icon: LucideIcon
-}
+  title: string;
+  url: string;
+  icon: LucideIcon;
+};
 
 interface Props {
-  item: TNavHome,
-  isCollapsed: boolean
+  item: TNavHome;
+  isCollapsed: boolean;
 }
 
 export default function NavHome({ item, isCollapsed }: Props) {
@@ -22,16 +27,16 @@ export default function NavHome({ item, isCollapsed }: Props) {
       <SidebarGroupContent>
         <SidebarMenu>
           <SidebarMenuItem key={item.title}>
-            <SidebarMenuButton asChild tooltip={item.title}
+            <SidebarMenuButton
+              asChild
+              tooltip={item.title}
               isActive={activeItem === item.title}
               onClick={() => handleItemClick(item.title)}
             >
               {item.url && (
-                <Link
-                  to={item.url && item.url}
-                >
+                <Link to={item.url && item.url}>
                   <item.icon />
-                  {!isCollapsed && <span className=''>{item.title}</span>}
+                  {!isCollapsed && <span className="">{item.title}</span>}
                 </Link>
               )}
             </SidebarMenuButton>
@@ -39,5 +44,5 @@ export default function NavHome({ item, isCollapsed }: Props) {
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>
-  )
+  );
 }

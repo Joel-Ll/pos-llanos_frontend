@@ -15,8 +15,13 @@ import {
 
 import {
   Sidebar,
-  SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarRail,
-  useSidebar
+  SidebarContent,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarRail,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import NavSales from "./nav-sales";
 import NavHome from "./nav-home";
@@ -27,21 +32,21 @@ import NavConfig from "./nav-config";
 
 export const navigation = {
   home: {
-    title: 'Inicio',
-    url: '/home',
+    title: "Inicio",
+    url: "/home",
     icon: Home,
   },
 
   sales: [
     {
-      title: 'Nueva Venta',
-      url: '/sales',
-      icon: ShoppingCart
+      title: "Nueva Venta",
+      url: "/sales",
+      icon: ShoppingCart,
     },
     {
-      title: 'Historial',
-      url: '/sales/history',
-      icon: ListCheck
+      title: "Historial",
+      url: "/sales/history",
+      icon: ListCheck,
     },
   ],
   catalog: [
@@ -53,24 +58,24 @@ export const navigation = {
     {
       title: "Categorías",
       url: "/categories",
-      icon: Folders
+      icon: Folders,
     },
     {
       title: "Proveedores",
       url: "/suppliers",
-      icon: Truck
-    }
+      icon: Truck,
+    },
   ],
   inventory: [
     {
       title: "Compras",
       url: "/purchases",
-      icon: Store
+      icon: Store,
     },
     {
       title: "Ajustes de Stock",
       url: "/adjustments",
-      icon: Settings2
+      icon: Settings2,
     },
   ],
   operations: [
@@ -88,14 +93,14 @@ export const navigation = {
   config: {
     title: "Perfil",
     url: "/config/profile",
-    icon: UserRoundCog
-  }
-}
+    icon: UserRoundCog,
+  },
+};
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { state } = useSidebar();
   const isCollapsed = state === "collapsed";
-  
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -107,7 +112,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <Cog className="size-4" />
                 </div>
                 <div className="flex flex-col gap-0.5 leading-none">
-                  <span className="font-medium uppercase">AUT. ROSARIO</span>
+                  <span className="font-medium uppercase">Aut. Llanos</span>
                 </div>
               </div>
             </SidebarMenuButton>
@@ -115,19 +120,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavHome
-          item={navigation.home}
-          isCollapsed={isCollapsed}
-        />
-        <NavSales
-          sales={navigation.sales}
-          isCollapsed={isCollapsed}
-        />
+        <NavHome item={navigation.home} isCollapsed={isCollapsed} />
+        <NavSales sales={navigation.sales} isCollapsed={isCollapsed} />
 
-        <NavCatalog
-          catalog={navigation.catalog}
-          isCollapsed={isCollapsed}
-        />
+        <NavCatalog catalog={navigation.catalog} isCollapsed={isCollapsed} />
 
         <NavInventory
           inventory={navigation.inventory}
@@ -139,12 +135,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           isCollapsed={isCollapsed}
         />
 
-        <NavConfig 
-          item={navigation.config}
-          isCollapsed={isCollapsed}
-        />
+        <NavConfig item={navigation.config} isCollapsed={isCollapsed} />
       </SidebarContent>
       <SidebarRail />
     </Sidebar>
-  )
+  );
 }

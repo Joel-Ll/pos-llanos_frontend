@@ -1,17 +1,31 @@
-import type { ColumnDef } from "@tanstack/react-table"
-import { Badge } from '@/components/ui/badge'
-import type { CategoryProduct } from '@/types/categories/categories.types'
+import type { ColumnDef } from "@tanstack/react-table";
+import { Badge } from "@/components/ui/badge";
+import type { CategoryProduct } from "@/types/categories/categories.types";
 import { Package } from "lucide-react";
 import { getThumbnailUrl } from "@/utils";
 
 const getStockStatus = (current: number, min: number) => {
-  if (current === 0) return { label: "Sin stock", variant: "destructive" as const, className: "bg-destructive/10 text-destructive border-destructive/20" };
-  if (current < min) return { label: "Stock bajo", variant: "outline" as const, className: "bg-orange-500/10 text-orange-600 border-orange-500/20" };
-  return { label: "Normal", variant: "outline" as const, className: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" };
+  if (current === 0)
+    return {
+      label: "Sin stock",
+      variant: "destructive" as const,
+      className: "bg-destructive/10 text-destructive border-destructive/20",
+    };
+  if (current < min)
+    return {
+      label: "Stock bajo",
+      variant: "outline" as const,
+      className: "bg-orange-500/10 text-orange-600 border-orange-500/20",
+    };
+  return {
+    label: "Normal",
+    variant: "outline" as const,
+    className: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20",
+  };
 };
 
 const margin = (product: CategoryProduct) => {
-  const diff = product.salePrice - product.purchasePrice;
+  const diff = +(product.salePrice - product.purchasePrice).toFixed(2);
   const pct = +((diff / product.purchasePrice) * 100).toFixed(0);
   return { diff, pct };
 };
@@ -49,7 +63,10 @@ export const columns: ColumnDef<CategoryProduct>[] = [
               </p>
 
               <p className="text-sm text-muted-foreground truncate">
-                {row.original.catalogCode === '' ? 's/n' : row.original.catalogCode} - #{row.original.internalCode}
+                {row.original.catalogCode === ""
+                  ? "s/n"
+                  : row.original.catalogCode}{" "}
+                - #{row.original.internalCode}
               </p>
             </div>
           </div>
@@ -61,18 +78,12 @@ export const columns: ColumnDef<CategoryProduct>[] = [
   {
     accessorKey: "brand",
     header: "Marca",
-    cell: ({ row }) => (
-      <Badge variant="outline" >
-        {row.original.brand}
-      </Badge>
-    )
+    cell: ({ row }) => <Badge variant="outline">{row.original.brand}</Badge>,
   },
   // stock
   {
     accessorKey: "currentStock",
-    header: () => (
-      <div className='text-center'>Stock</div>
-    ),
+    header: () => <div className="text-center">Stock</div>,
     filterFn: (row, _, value) => {
       const stock = row.original.currentStock;
       const min = row.original.minStock;
@@ -92,43 +103,46 @@ export const columns: ColumnDef<CategoryProduct>[] = [
       }
     },
     cell: ({ row }) => {
-      const status = getStockStatus(row.original.currentStock, row.original.minStock);
+      const status = getStockStatus(
+        row.original.currentStock,
+        row.original.minStock
+      );
       return (
         <div className="flex gap-5 items-center text-center justify-center">
-          <p className='text-center font-semibold'>{row.original.currentStock}/{row.original.minStock}</p>
+          <p className="text-center font-semibold">
+            {row.original.currentStock}/{row.original.minStock}
+          </p>
           <Badge variant={status.variant} className={status.className}>
             {status.label}
           </Badge>
         </div>
-      )
-    }
+      );
+    },
   },
   // Precio de compra
   {
     accessorKey: "purchasePrice",
-    header: () => (
-      <div className='text-right'>P. Compra</div>
-    ),
+    header: () => <div className="text-right">P. Compra</div>,
     cell: ({ row }) => (
-      <div className='text-right'>Bs. {row.original.purchasePrice.toLocaleString()}</div>
-    )
+      <div className="text-right">
+        Bs. {row.original.purchasePrice.toLocaleString()}
+      </div>
+    ),
   },
   // Precio de venta
   {
     accessorKey: "salePrice",
-    header: () => (
-      <div className='text-right'>P. Venta</div>
-    ),
+    header: () => <div className="text-right">P. Venta</div>,
     cell: ({ row }) => (
-      <div className='text-right'>Bs. {row.original.salePrice.toLocaleString()}</div>
-    )
+      <div className="text-right">
+        Bs. {row.original.salePrice.toLocaleString()}
+      </div>
+    ),
   },
   // Margen de ganancia
   {
     accessorKey: "profit",
-    header: () => (
-      <div className='text-center'>Margen</div>
-    ),
+    header: () => <div className="text-center">Margen</div>,
     cell: ({ row }) => {
       const m = margin(row.original);
 
@@ -148,31 +162,33 @@ export const columns: ColumnDef<CategoryProduct>[] = [
       }
 
       return (
-        <div className='text-center px-2 py-0.5 text-xs'>
+        <div className="text-center px-2 py-0.5 text-xs">
           <span className={`font-medium px-2 py-1 rounded-full ${colorClass}`}>
             {icon} Bs. {m.diff} ({m.pct}%)
           </span>
         </div>
       );
-    }
+    },
   },
   // STATE
   {
     accessorKey: "isActive",
     header: "Estado",
     cell: ({ row }) => {
-      const isActive: boolean = row.getValue('isActive');
+      const isActive: boolean = row.getValue("isActive");
 
       return (
-        <Badge variant={'outline'} className={
-          isActive
-            ? "border-emerald-500 text-emerald-600 bg-emerald-50"
-            : "border-red-500 text-red-600 bg-red-50"
-        }>
+        <Badge
+          variant={"outline"}
+          className={
+            isActive
+              ? "border-emerald-500 text-emerald-600 bg-emerald-50"
+              : "border-red-500 text-red-600 bg-red-50"
+          }
+        >
           {isActive ? "Activo" : "Inactivo"}
         </Badge>
       );
-    }
+    },
   },
-
-]
+];

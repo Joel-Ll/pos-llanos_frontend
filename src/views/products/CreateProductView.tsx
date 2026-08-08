@@ -1,48 +1,69 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useSelectCategory } from '@/hooks/useCategory';
-import { useSelectSupplier } from '@/hooks/useSupplier';
-import { toast } from 'sonner';
+import { useState } from "react";
+import { useNavigate } from "react-router";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useSelectCategory } from "@/hooks/useCategory";
+import { useSelectSupplier } from "@/hooks/useSupplier";
+import { toast } from "sonner";
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
-import UploadImage from '@/components/UploadImage';
-import { productFormSchema, unitType, type ProductFormValues } from '@/types/products/products.type';
-import type { SupplierSelect } from '@/types/suppliers/suppliers.type';
-import { createProductAction } from '@/actions/products/create-product.action';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import UploadImage from "@/components/UploadImage";
+import {
+  productFormSchema,
+  unitType,
+  type ProductFormValues,
+} from "@/types/products/products.type";
+import type { SupplierSelect } from "@/types/suppliers/suppliers.type";
+import { createProductAction } from "@/actions/products/create-product.action";
 
 export default function CreateProductView() {
   const navigate = useNavigate();
-  const [publicId, setPublicId] = useState<string | undefined>('');
-  const [imagePreview, setImagePreview] = useState<string | undefined>(undefined);
+  const [publicId, setPublicId] = useState<string | undefined>("");
+  const [imagePreview, setImagePreview] = useState<string | undefined>(
+    undefined
+  );
   const { data: categoriesSelect } = useSelectCategory();
   const { data: suppliersSelect } = useSelectSupplier();
-  const suppliersActive = suppliersSelect?.filter(supp => supp.isActive) || [];
+  const suppliersActive =
+    suppliersSelect?.filter((supp) => supp.isActive) || [];
 
-  const activeCategories = categoriesSelect?.filter(cat => cat.isActive) || [];
+  const activeCategories =
+    categoriesSelect?.filter((cat) => cat.isActive) || [];
 
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productFormSchema),
     defaultValues: {
-      catalogCode: '',
-      location: '',
-      description: '',
-      image: '',
-      category: '',
-      supplier: '',
-      brand: '',
-      unidadMedida: '',
+      catalogCode: "",
+      location: "",
+      description: "",
+      image: "",
+      category: "",
+      supplier: "",
+      brand: "",
+      unidadMedida: "",
       minStock: undefined,
       purchasePrice: undefined,
       salePrice: undefined,
-      discountReference: undefined
+      discountReference: undefined,
     },
   });
 
@@ -53,21 +74,21 @@ export default function CreateProductView() {
       toast.error(error.message);
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['categories'] });
-      queryClient.invalidateQueries({ queryKey: ['products'] });
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+      queryClient.invalidateQueries({ queryKey: ["products"] });
       toast.success(data);
       handleClose();
-    }
+    },
   });
 
   const handleSubmit = (formData: ProductFormValues) => {
     mutate(formData);
-  }
+  };
 
   const handleClose = () => {
     form.reset();
     navigate(-1);
-  }
+  };
 
   return (
     <div data-aos="fade-in" data-aos-duration="300">
@@ -80,7 +101,10 @@ export default function CreateProductView() {
 
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+            <form
+              onSubmit={form.handleSubmit(handleSubmit)}
+              className="space-y-6"
+            >
               {/* Image Upload */}
               <UploadImage
                 form={form}
@@ -98,7 +122,7 @@ export default function CreateProductView() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Código de Catálogo (opcional)</FormLabel>
-                      <FormControl >
+                      <FormControl>
                         <Input placeholder="LD-7153" {...field} />
                       </FormControl>
                       <FormMessage />
@@ -113,7 +137,7 @@ export default function CreateProductView() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Marca</FormLabel>
-                      <FormControl >
+                      <FormControl>
                         <Input placeholder="FRICCION" {...field} />
                       </FormControl>
                       <FormMessage />
@@ -135,14 +159,18 @@ export default function CreateProductView() {
                         defaultValue={field.value}
                       >
                         <FormControl>
-                          <SelectTrigger className='w-auto'>
+                          <SelectTrigger className="w-auto">
                             <SelectValue placeholder="Selecciona categoría" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
                           {activeCategories.length > 0 ? (
                             activeCategories.map((item) => (
-                              <SelectItem key={item._id} value={item._id} className='uppercase'>
+                              <SelectItem
+                                key={item._id}
+                                value={item._id}
+                                className="uppercase"
+                              >
                                 {item.name}
                               </SelectItem>
                             ))
@@ -172,7 +200,7 @@ export default function CreateProductView() {
                         defaultValue={field.value}
                       >
                         <FormControl>
-                          <SelectTrigger className='w-auto'>
+                          <SelectTrigger className="w-auto">
                             <SelectValue placeholder="Selecciona Proveedor" />
                           </SelectTrigger>
                         </FormControl>
@@ -180,7 +208,7 @@ export default function CreateProductView() {
                           {suppliersActive && suppliersActive.length > 0 ? (
                             <>
                               {suppliersActive.map((item: SupplierSelect) => (
-                                <SelectItem key={item._id} value={item._id} >
+                                <SelectItem key={item._id} value={item._id}>
                                   {item.enterprise}
                                 </SelectItem>
                               ))}
@@ -214,7 +242,7 @@ export default function CreateProductView() {
                         defaultValue={field.value}
                       >
                         <FormControl>
-                          <SelectTrigger className='w-auto'>
+                          <SelectTrigger className="w-auto">
                             <SelectValue placeholder="Selecciona una medida" />
                           </SelectTrigger>
                         </FormControl>
@@ -222,7 +250,7 @@ export default function CreateProductView() {
                           {unitType && (
                             <>
                               {unitType.map((item) => (
-                                <SelectItem key={item.id} value={item.value} >
+                                <SelectItem key={item.id} value={item.value}>
                                   {item.label}
                                 </SelectItem>
                               ))}
@@ -242,13 +270,17 @@ export default function CreateProductView() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Stock Mínimo</FormLabel>
-                      <FormControl >
+                      <FormControl>
                         <Input
                           type="number"
                           placeholder="0"
                           value={field.value ?? ""}
                           onChange={(e) =>
-                            field.onChange(e.target.value === "" ? undefined : Number(e.target.value))
+                            field.onChange(
+                              e.target.value === ""
+                                ? undefined
+                                : Number(e.target.value)
+                            )
                           }
                         />
                       </FormControl>
@@ -264,13 +296,17 @@ export default function CreateProductView() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Precio de Compra (Bs.)</FormLabel>
-                      <FormControl >
+                      <FormControl>
                         <Input
                           type="number"
                           placeholder="0"
                           value={field.value ?? ""}
                           onChange={(e) =>
-                            field.onChange(e.target.value === "" ? undefined : Number(e.target.value))
+                            field.onChange(
+                              e.target.value === ""
+                                ? undefined
+                                : Number(e.target.value)
+                            )
                           }
                         />
                       </FormControl>
@@ -286,13 +322,17 @@ export default function CreateProductView() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Precio de Venta (Bs.)</FormLabel>
-                      <FormControl >
+                      <FormControl>
                         <Input
                           type="number"
                           placeholder="0"
                           value={field.value ?? ""}
                           onChange={(e) =>
-                            field.onChange(e.target.value === "" ? undefined : Number(e.target.value))
+                            field.onChange(
+                              e.target.value === ""
+                                ? undefined
+                                : Number(e.target.value)
+                            )
                           }
                         />
                       </FormControl>
@@ -308,13 +348,17 @@ export default function CreateProductView() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Referencia de descuento (Bs.)</FormLabel>
-                      <FormControl >
-                        <Input 
+                      <FormControl>
+                        <Input
                           type="number"
                           placeholder="0"
                           value={field.value ?? ""}
                           onChange={(e) =>
-                            field.onChange(e.target.value === "" ? undefined : Number(e.target.value))
+                            field.onChange(
+                              e.target.value === ""
+                                ? undefined
+                                : Number(e.target.value)
+                            )
                           }
                         />
                       </FormControl>
@@ -330,7 +374,7 @@ export default function CreateProductView() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Ubicación (opcional)</FormLabel>
-                      <FormControl >
+                      <FormControl>
                         <Input placeholder="A-01" {...field} />
                       </FormControl>
                       <FormMessage />
@@ -366,14 +410,12 @@ export default function CreateProductView() {
                 >
                   Cancelar
                 </Button>
-                <Button type="submit">
-                  Registrar Producto
-                </Button>
+                <Button type="submit">Registrar Producto</Button>
               </div>
             </form>
           </Form>
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

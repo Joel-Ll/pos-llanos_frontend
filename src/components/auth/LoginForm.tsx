@@ -1,25 +1,22 @@
-import { useState } from 'react';
-import { useForm } from 'react-hook-form'
-import { useNavigate } from 'react-router';
-import { useMutation } from '@tanstack/react-query'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod';
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router";
+import { useMutation } from "@tanstack/react-query";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff } from "lucide-react";
 
-import { Button } from '@/components/ui/button'
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
-import {
-  Field,
-  FieldGroup,
-} from '@/components/ui/field'
-import { Input } from '@/components/ui/input'
+} from "@/components/ui/card";
+import { Field, FieldGroup } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 
 import {
   Form,
@@ -27,23 +24,23 @@ import {
   FormField,
   FormItem,
   FormLabel,
-} from '@/components/ui/form'
-import { Spinner } from '@/components/ui/spinner';
+} from "@/components/ui/form";
+import { Spinner } from "@/components/ui/spinner";
 
-import { loginFormSchema } from '@/types/auth/auth.types';
-import { authenticateAction } from '@/actions/auth/authenticate.action';
-import ErrorMessage from '../utils/error-message';
-import { useSidebarStore } from '@/store/sidebar.store';
+import { loginFormSchema } from "@/types/auth/auth.types";
+import { authenticateAction } from "@/actions/auth/authenticate.action";
+import ErrorMessage from "../utils/error-message";
+import { useSidebarStore } from "@/store/sidebar.store";
 
 export default function LoginForm() {
   const { handleItemClick } = useSidebarStore();
   const navigate = useNavigate();
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const form = useForm<z.infer<typeof loginFormSchema>>({
     resolver: zodResolver(loginFormSchema),
     defaultValues: {
-      username: '',
-      password: ''
+      username: "",
+      password: "",
     },
   });
 
@@ -53,18 +50,18 @@ export default function LoginForm() {
       setError(err.message);
       form.reset();
       setTimeout(() => {
-        setError('');
+        setError("");
       }, 3000);
     },
     onSuccess: () => {
-      handleItemClick('Inicio');
-      navigate('/home');
-    }
+      handleItemClick("Inicio");
+      navigate("/home");
+    },
   });
 
   const onSubmit = (formData: z.infer<typeof loginFormSchema>) => {
     mutate(formData);
-  }
+  };
 
   return (
     <div className="flex flex-col gap-6">
@@ -72,20 +69,16 @@ export default function LoginForm() {
         <CardHeader>
           <div className="flex justify-center">
             <img
-              src="/logo2.png"
+              src="/logo4.png"
               alt="Lubricantes y Autopartes Rosario"
               className="h-40 w-auto object-contain"
             />
           </div>
 
           <div className="text-center">
-            <CardTitle className="text-2xl">
-              Iniciar Sesión
-            </CardTitle>
+            <CardTitle className="text-2xl">Iniciar Sesión</CardTitle>
 
-            <CardDescription>
-              Ingrese su usuario y contraseña para acceder al sistema.
-            </CardDescription>
+            <CardDescription>Ingrese su usuario y contraseña</CardDescription>
           </div>
         </CardHeader>
 
@@ -95,7 +88,7 @@ export default function LoginForm() {
               <FieldGroup>
                 <FormField
                   control={form.control}
-                  name='username'
+                  name="username"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Usuario</FormLabel>
@@ -103,7 +96,7 @@ export default function LoginForm() {
                         <Input
                           placeholder="Juan"
                           required
-                          autoComplete='username'
+                          autoComplete="username"
                           {...field}
                         />
                       </FormControl>
@@ -113,7 +106,7 @@ export default function LoginForm() {
 
                 <FormField
                   control={form.control}
-                  name='password'
+                  name="password"
                   render={({ field }) => {
                     const [showPassword, setShowPassword] = useState(false);
 
@@ -144,7 +137,7 @@ export default function LoginForm() {
                             <Input
                               required
                               type={showPassword ? "text" : "password"}
-                              autoComplete='current-password'
+                              autoComplete="current-password"
                               {...field}
                             />
                           </div>
@@ -154,14 +147,20 @@ export default function LoginForm() {
                   }}
                 />
 
-                {isPending &&
+                {isPending && (
                   <div className="flex items-center justify-center gap-4">
-                    <Spinner className='size-6' />
+                    <Spinner className="size-6" />
                   </div>
-                }
+                )}
 
                 <Field>
-                  <Button className='cursor-pointer' type="submit" disabled={isPending}>Ingresar</Button>
+                  <Button
+                    className="cursor-pointer"
+                    type="submit"
+                    disabled={isPending}
+                  >
+                    Ingresar
+                  </Button>
                 </Field>
                 {error && <ErrorMessage>{error}</ErrorMessage>}
               </FieldGroup>
@@ -170,5 +169,5 @@ export default function LoginForm() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

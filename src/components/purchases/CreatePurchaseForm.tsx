@@ -1,62 +1,94 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router';
-import { Controller, useFieldArray, useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useSelectSupplier } from '@/hooks/useSupplier';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useState } from "react";
+import { useNavigate } from "react-router";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useSelectSupplier } from "@/hooks/useSupplier";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { CalendarIcon, Minus, Package, ShoppingCart, Trash2, TrendingDown, TrendingUp } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import {
+  CalendarIcon,
+  Minus,
+  Package,
+  ShoppingCart,
+  Trash2,
+  TrendingDown,
+  TrendingUp,
+} from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { Field, FieldError, FieldLabel } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
-import { TableHeader, TableRow, TableHead, TableBody, TableCell, TableFooter, Table } from '@/components/ui/table';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { SearchableSelect } from '@/components/ui/searchable-select';
-import { Label } from '@/components/ui/label';
+} from "@/components/ui/select";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  TableHeader,
+  TableRow,
+  TableHead,
+  TableBody,
+  TableCell,
+  TableFooter,
+  Table,
+} from "@/components/ui/table";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { SearchableSelect } from "@/components/ui/searchable-select";
+import { Label } from "@/components/ui/label";
 
-import type { SupplierSelect } from '@/types/suppliers/suppliers.type';
-import { purchaseFormSchema, type ProductCatalog, type ProductItem, type PurchaseFormValues } from '@/types/purchases/purchases-type';
+import type { SupplierSelect } from "@/types/suppliers/suppliers.type";
+import {
+  purchaseFormSchema,
+  type ProductCatalog,
+  type ProductItem,
+  type PurchaseFormValues,
+} from "@/types/purchases/purchases-type";
 
-import { getProductsItemAction } from '@/actions/purchases/get-products-item.action';
-import { registerPurchaseAction } from '@/actions/purchases/register-purchase.action';
-import { cn } from '@/lib/utils';
-import { formatDate, getThumbnailUrl } from '@/utils';
+import { getProductsItemAction } from "@/actions/purchases/get-products-item.action";
+import { registerPurchaseAction } from "@/actions/purchases/register-purchase.action";
+import { cn } from "@/lib/utils";
+import { formatDate, getThumbnailUrl } from "@/utils";
 import { toast } from "sonner";
-import type z from 'zod';
+import type z from "zod";
+import { es } from "date-fns/locale";
 
 export const CreatePurchaseForm = () => {
   const navigate = useNavigate();
   const { data: suppliersSelect = [] } = useSelectSupplier();
   const [searchOpen, setSearchOpen] = useState(false);
 
-  const suppliersActive = suppliersSelect?.filter(supp => supp.isActive) || [];
+  const suppliersActive =
+    suppliersSelect?.filter((supp) => supp.isActive) || [];
 
   const { data: catalogProducts } = useQuery({
-    queryKey: ['product-items'],
+    queryKey: ["product-items"],
     queryFn: getProductsItemAction,
     retry: false,
   });
 
-  const activeProducts = catalogProducts?.filter(prod => prod.isActive) || [];
+  const activeProducts = catalogProducts?.filter((prod) => prod.isActive) || [];
 
   const form = useForm<PurchaseFormValues>({
     resolver: zodResolver(purchaseFormSchema),
     defaultValues: {
-      supplier: '',
-      invoiceNumber: '',
+      supplier: "",
+      invoiceNumber: "",
       date: undefined,
-      detail: '',
-      items: []
+      detail: "",
+      items: [],
     },
   });
 
@@ -97,7 +129,7 @@ export const CreatePurchaseForm = () => {
     if (!previous || previous === 0) return null;
     const diff = ((current - previous) / previous) * 100;
     if (Math.abs(diff) < 0.01) return { type: "equal" as const, diff: 0 };
-    return { type: diff > 0 ? "up" as const : "down" as const, diff };
+    return { type: diff > 0 ? ("up" as const) : ("down" as const), diff };
   };
 
   const queryClient = useQueryClient();
@@ -107,12 +139,12 @@ export const CreatePurchaseForm = () => {
       toast.error(error.message);
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['purchases'] });
-      queryClient.invalidateQueries({ queryKey: ['product-items'] });
+      queryClient.invalidateQueries({ queryKey: ["purchases"] });
+      queryClient.invalidateQueries({ queryKey: ["product-items"] });
       navigate(-1);
       toast.success(data);
-    }
-  })
+    },
+  });
 
   function onSubmit(data: z.infer<typeof purchaseFormSchema>) {
     mutate(data);
@@ -121,21 +153,19 @@ export const CreatePurchaseForm = () => {
   const handleClose = () => {
     form.reset();
     navigate(-1);
-  }
+  };
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
+    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
       <Card>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Proveedor */}
             <Controller
-              name='supplier'
+              name="supplier"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field
-                  data-invalid={fieldState.invalid}
-                >
+                <Field data-invalid={fieldState.invalid}>
                   <FieldLabel>Proveedor *</FieldLabel>
                   <Select
                     name={field.name}
@@ -153,7 +183,7 @@ export const CreatePurchaseForm = () => {
                       {suppliersActive && suppliersActive.length > 0 ? (
                         <>
                           {suppliersActive.map((item: SupplierSelect) => (
-                            <SelectItem key={item._id} value={item._id} >
+                            <SelectItem key={item._id} value={item._id}>
                               {item.enterprise}
                             </SelectItem>
                           ))}
@@ -167,7 +197,9 @@ export const CreatePurchaseForm = () => {
                       )}
                     </SelectContent>
                   </Select>
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
                 </Field>
               )}
             />
@@ -178,7 +210,9 @@ export const CreatePurchaseForm = () => {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={field.name}>Nro. Factura / Lote *</FieldLabel>
+                  <FieldLabel htmlFor={field.name}>
+                    Nro. Factura / Lote *
+                  </FieldLabel>
                   <Input
                     {...field}
                     id={field.name}
@@ -186,7 +220,9 @@ export const CreatePurchaseForm = () => {
                     placeholder="Ej: FAC-00123"
                     autoComplete="off"
                   />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
                 </Field>
               )}
             />
@@ -209,7 +245,11 @@ export const CreatePurchaseForm = () => {
                         )}
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {field.value ? formatDate(new Date(field.value)) : <span>Seleccione una fecha</span>}
+                        {field.value ? (
+                          formatDate(new Date(field.value))
+                        ) : (
+                          <span>Seleccione una fecha</span>
+                        )}
                       </Button>
                     </PopoverTrigger>
 
@@ -218,11 +258,14 @@ export const CreatePurchaseForm = () => {
                         mode="single"
                         selected={field.value}
                         onSelect={(date) => field.onChange(date)}
+                        locale={es}
                       />
                     </PopoverContent>
                   </Popover>
 
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
                 </Field>
               )}
             />
@@ -233,7 +276,9 @@ export const CreatePurchaseForm = () => {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={field.name}>Detalle / Observación</FieldLabel>
+                  <FieldLabel htmlFor={field.name}>
+                    Detalle / Observación
+                  </FieldLabel>
                   <Input
                     {...field}
                     id={field.name}
@@ -241,7 +286,9 @@ export const CreatePurchaseForm = () => {
                     placeholder="Nota adicional..."
                     autoComplete="off"
                   />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
                 </Field>
               )}
             />
@@ -249,8 +296,7 @@ export const CreatePurchaseForm = () => {
         </CardContent>
       </Card>
 
-
-      <Card className='mt-5'>
+      <Card className="mt-5">
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2 text-xl">
@@ -259,7 +305,7 @@ export const CreatePurchaseForm = () => {
             </CardTitle>
 
             <SearchableSelect
-              label='Agregar Producto'
+              label="Agregar Producto"
               searchOpen={searchOpen}
               setSearchOpen={setSearchOpen}
               catalogProducts={activeProducts}
@@ -268,10 +314,12 @@ export const CreatePurchaseForm = () => {
           </div>
         </CardHeader>
         <CardContent>
-          {form.getValues('items').length === 0 ? (
+          {form.getValues("items").length === 0 ? (
             <div className="text-center py-16 border-2 border-dashed rounded-lg">
               <ShoppingCart className="h-12 w-12 mx-auto text-muted-foreground/40 mb-3" />
-              <p className="text-muted-foreground font-medium">No hay productos agregados</p>
+              <p className="text-muted-foreground font-medium">
+                No hay productos agregados
+              </p>
               <p className="text-sm text-muted-foreground/60 mt-1">
                 Use el botón "Agregar Producto" para buscar y seleccionar
               </p>
@@ -285,16 +333,23 @@ export const CreatePurchaseForm = () => {
                     <TableRow>
                       <TableHead className="w-12">#</TableHead>
                       <TableHead>Producto</TableHead>
-                      <TableHead className="w-28 text-center">Cantidad</TableHead>
-                      <TableHead className="w-36 text-center">P. Compra</TableHead>
-                      <TableHead className="w-36 text-center">P. Venta</TableHead>
-                      <TableHead className="w-32 text-right">Subtotal</TableHead>
+                      <TableHead className="w-28 text-center">
+                        Cantidad
+                      </TableHead>
+                      <TableHead className="w-36 text-center">
+                        P. Compra
+                      </TableHead>
+                      <TableHead className="w-36 text-center">
+                        P. Venta
+                      </TableHead>
+                      <TableHead className="w-32 text-right">
+                        Subtotal
+                      </TableHead>
                       <TableHead className="w-16"></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-
-                    {form.getValues('items').map((item, index) => (
+                    {form.getValues("items").map((item, index) => (
                       <TableRow key={item._id}>
                         <TableCell className="text-muted-foreground font-mono text-xs py-8">
                           {index + 1}
@@ -304,7 +359,7 @@ export const CreatePurchaseForm = () => {
                             {item.image ? (
                               <img
                                 src={getThumbnailUrl(item.image)}
-                                alt='imagen producto'
+                                alt="imagen producto"
                                 className="h-15 w-15 rounded object-cover shrink-0"
                                 loading="lazy"
                               />
@@ -323,7 +378,10 @@ export const CreatePurchaseForm = () => {
                               </p>
 
                               <p className="text-xs text-muted-foreground truncate">
-                                #{item.internalCode} • {item.catalogCode === '' ? 's/n' : item.catalogCode}
+                                #{item.internalCode} •{" "}
+                                {item.catalogCode === ""
+                                  ? "s/n"
+                                  : item.catalogCode}
                               </p>
                             </div>
                           </div>
@@ -334,7 +392,11 @@ export const CreatePurchaseForm = () => {
                             min={1}
                             value={item.quantity}
                             onChange={(e) =>
-                              handleUpdateItem(index, "quantity", Number(e.target.value))
+                              handleUpdateItem(
+                                index,
+                                "quantity",
+                                Number(e.target.value)
+                              )
                             }
                             className="text-center h-9"
                           />
@@ -349,41 +411,60 @@ export const CreatePurchaseForm = () => {
                                   step={0.01}
                                   value={item.purchasePrice || 0}
                                   onChange={(e) =>
-                                    handleUpdateItem(index, "purchasePrice", Number(e.target.value))
+                                    handleUpdateItem(
+                                      index,
+                                      "purchasePrice",
+                                      Number(e.target.value)
+                                    )
                                   }
                                   className="text-center h-9"
                                 />
                               </TooltipTrigger>
 
-                              {item.purchasePrice != null && (() => {
-                                const originalProduct = catalogProducts?.find(p => p._id === item._id);
-                                if (!originalProduct?.purchasePrice) return null;
+                              {item.purchasePrice != null &&
+                                (() => {
+                                  const originalProduct = catalogProducts?.find(
+                                    (p) => p._id === item._id
+                                  );
+                                  if (!originalProduct?.purchasePrice)
+                                    return null;
 
-                                const info = getPriceDiff(item.purchasePrice, originalProduct.purchasePrice);
+                                  const info = getPriceDiff(
+                                    item.purchasePrice,
+                                    originalProduct.purchasePrice
+                                  );
 
-                                return (
-                                  <TooltipContent>
-                                    <div className="flex items-center gap-1.5 text-xs">
-                                      <span>Anterior: Bs. {originalProduct.purchasePrice.toFixed(2)}</span>
-                                      {info && info.type === "up" && (
-                                        <span className="text-red-400 flex items-center gap-0.5">
-                                          <TrendingUp className="h-3 w-3" />+{info.diff.toFixed(1)}%
+                                  return (
+                                    <TooltipContent>
+                                      <div className="flex items-center gap-1.5 text-xs">
+                                        <span>
+                                          Anterior: Bs.{" "}
+                                          {originalProduct.purchasePrice.toFixed(
+                                            2
+                                          )}
                                         </span>
-                                      )}
-                                      {info && info.type === "down" && (
-                                        <span className="text-emerald-400 flex items-center gap-0.5">
-                                          <TrendingDown className="h-3 w-3" />{info.diff.toFixed(1)}%
-                                        </span>
-                                      )}
-                                      {info && info.type === "equal" && (
-                                        <span className="flex items-center gap-0.5">
-                                          <Minus className="h-3 w-3" />0%
-                                        </span>
-                                      )}
-                                    </div>
-                                  </TooltipContent>
-                                );
-                              })()}
+                                        {info && info.type === "up" && (
+                                          <span className="text-red-400 flex items-center gap-0.5">
+                                            <TrendingUp className="h-3 w-3" />+
+                                            {info.diff.toFixed(1)}%
+                                          </span>
+                                        )}
+                                        {info && info.type === "down" && (
+                                          <span className="text-emerald-400 flex items-center gap-0.5">
+                                            <TrendingDown className="h-3 w-3" />
+                                            {info.diff.toFixed(1)}%
+                                          </span>
+                                        )}
+                                        {info && info.type === "equal" && (
+                                          <span className="flex items-center gap-0.5">
+                                            <Minus className="h-3 w-3" />
+                                            0%
+                                          </span>
+                                        )}
+                                      </div>
+                                    </TooltipContent>
+                                  );
+                                })()}
                             </Tooltip>
                           </TooltipProvider>
                         </TableCell>
@@ -397,39 +478,56 @@ export const CreatePurchaseForm = () => {
                                   step={0.01}
                                   value={item.salePrice}
                                   onChange={(e) =>
-                                    handleUpdateItem(index, "salePrice", Number(e.target.value))
+                                    handleUpdateItem(
+                                      index,
+                                      "salePrice",
+                                      Number(e.target.value)
+                                    )
                                   }
                                   className="text-center h-9"
                                 />
                               </TooltipTrigger>
-                              {item.salePrice != null && (() => {
-                                const originalProduct = catalogProducts?.find(p => p._id === item._id);
-                                if (!originalProduct?.purchasePrice) return null;
+                              {item.salePrice != null &&
+                                (() => {
+                                  const originalProduct = catalogProducts?.find(
+                                    (p) => p._id === item._id
+                                  );
+                                  if (!originalProduct?.purchasePrice)
+                                    return null;
 
-                                const info = getPriceDiff(item.salePrice, originalProduct.salePrice);
-                                return (
-                                  <TooltipContent>
-                                    <div className="flex items-center gap-1.5 text-xs">
-                                      <span>Anterior: Bs. {originalProduct.salePrice.toFixed(2)}</span>
-                                      {info && info.type === "up" && (
-                                        <span className="text-emerald-400 flex items-center gap-0.5">
-                                          <TrendingUp className="h-3 w-3" />+{info.diff.toFixed(1)}%
+                                  const info = getPriceDiff(
+                                    item.salePrice,
+                                    originalProduct.salePrice
+                                  );
+                                  return (
+                                    <TooltipContent>
+                                      <div className="flex items-center gap-1.5 text-xs">
+                                        <span>
+                                          Anterior: Bs.{" "}
+                                          {originalProduct.salePrice.toFixed(2)}
                                         </span>
-                                      )}
-                                      {info && info.type === "down" && (
-                                        <span className="text-red-400 flex items-center gap-0.5">
-                                          <TrendingDown className="h-3 w-3" />{info.diff.toFixed(1)}%
-                                        </span>
-                                      )}
-                                      {info && info.type === "equal" && (
-                                        <span className="flex items-center gap-0.5">
-                                          <Minus className="h-3 w-3" />0%
-                                        </span>
-                                      )}
-                                    </div>
-                                  </TooltipContent>
-                                );
-                              })()}
+                                        {info && info.type === "up" && (
+                                          <span className="text-emerald-400 flex items-center gap-0.5">
+                                            <TrendingUp className="h-3 w-3" />+
+                                            {info.diff.toFixed(1)}%
+                                          </span>
+                                        )}
+                                        {info && info.type === "down" && (
+                                          <span className="text-red-400 flex items-center gap-0.5">
+                                            <TrendingDown className="h-3 w-3" />
+                                            {info.diff.toFixed(1)}%
+                                          </span>
+                                        )}
+                                        {info && info.type === "equal" && (
+                                          <span className="flex items-center gap-0.5">
+                                            <Minus className="h-3 w-3" />
+                                            0%
+                                          </span>
+                                        )}
+                                      </div>
+                                    </TooltipContent>
+                                  );
+                                })()}
                             </Tooltip>
                           </TooltipProvider>
                         </TableCell>
@@ -438,7 +536,7 @@ export const CreatePurchaseForm = () => {
                         </TableCell>
                         <TableCell>
                           <Button
-                            type='button'
+                            type="button"
                             variant="ghost"
                             size="icon"
                             onClick={() => handleRemoveItem(index)}
@@ -452,11 +550,14 @@ export const CreatePurchaseForm = () => {
                   </TableBody>
                   <TableFooter>
                     <TableRow>
-                      <TableCell colSpan={5} className="text-right font-semibold text-base">
+                      <TableCell
+                        colSpan={5}
+                        className="text-right font-semibold text-base"
+                      >
                         Total:
                       </TableCell>
                       <TableCell className="text-right font-bold text-lg text-primary tabular-nums">
-                        Bs. {getTotal(form.getValues('items')).toLocaleString()}
+                        Bs. {getTotal(form.getValues("items")).toLocaleString()}
                       </TableCell>
                       <TableCell />
                     </TableRow>
@@ -470,7 +571,6 @@ export const CreatePurchaseForm = () => {
                   <>
                     <Card key={item._id}>
                       <CardContent className="p-4 space-y-4">
-
                         {/* Producto */}
                         <div className="flex gap-3">
                           {item.image ? (
@@ -490,7 +590,10 @@ export const CreatePurchaseForm = () => {
                             </p>
 
                             <p className="text-xs text-muted-foreground truncate">
-                              #{item.internalCode} • {item.catalogCode === '' ? 's/n' : item.catalogCode}
+                              #{item.internalCode} •{" "}
+                              {item.catalogCode === ""
+                                ? "s/n"
+                                : item.catalogCode}
                             </p>
                           </div>
 
@@ -504,37 +607,49 @@ export const CreatePurchaseForm = () => {
                         </div>
 
                         {/* Cantidad */}
-                        <div className='space-y-2'>
+                        <div className="space-y-2">
                           <Label>Cantidad</Label>
                           <Input
                             type="number"
                             value={item.quantity}
                             onChange={(e) =>
-                              handleUpdateItem(index, "quantity", Number(e.target.value))
+                              handleUpdateItem(
+                                index,
+                                "quantity",
+                                Number(e.target.value)
+                              )
                             }
                           />
                         </div>
 
                         {/* Compra */}
-                        <div className='space-y-2'>
+                        <div className="space-y-2">
                           <Label>Precio compra</Label>
                           <Input
                             type="number"
                             value={item.purchasePrice}
                             onChange={(e) =>
-                              handleUpdateItem(index, "purchasePrice", Number(e.target.value))
+                              handleUpdateItem(
+                                index,
+                                "purchasePrice",
+                                Number(e.target.value)
+                              )
                             }
                           />
                         </div>
 
                         {/* Venta */}
-                        <div className='space-y-2'>
+                        <div className="space-y-2">
                           <Label>Precio venta</Label>
                           <Input
                             type="number"
                             value={item.salePrice}
                             onChange={(e) =>
-                              handleUpdateItem(index, "salePrice", Number(e.target.value))
+                              handleUpdateItem(
+                                index,
+                                "salePrice",
+                                Number(e.target.value)
+                              )
                             }
                           />
                         </div>
@@ -547,7 +662,6 @@ export const CreatePurchaseForm = () => {
                             Bs. {getSubtotal(item).toLocaleString()}
                           </span>
                         </div>
-
                       </CardContent>
                     </Card>
                     <Card className="mt-4">
@@ -557,7 +671,8 @@ export const CreatePurchaseForm = () => {
                         </span>
 
                         <span className="text-2xl font-bold text-primary">
-                          Bs. {getTotal(form.getValues("items")).toLocaleString()}
+                          Bs.{" "}
+                          {getTotal(form.getValues("items")).toLocaleString()}
                         </span>
                       </CardContent>
                     </Card>
@@ -573,11 +688,10 @@ export const CreatePurchaseForm = () => {
         <Button type="button" variant="outline" onClick={handleClose}>
           Cancelar
         </Button>
-        <Button type="submit" disabled={!form.getValues('items').length}>
+        <Button type="submit" disabled={!form.getValues("items").length}>
           Aceptar
         </Button>
-
       </div>
     </form>
-  )
-}
+  );
+};

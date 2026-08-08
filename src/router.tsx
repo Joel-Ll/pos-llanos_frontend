@@ -28,16 +28,20 @@ import CashRegistersView from './views/cash-register/CashRegistersView';
 import ProfileView from './views/profile/ProfileView';
 import DetailProductView from './views/products/DetailProductView';
 import SaleView from './views/sales/SaleView';
+import { ProtectedRoute } from './router/ProtectedRoute';
 
 const router = createBrowserRouter([
   {
     path: '/auth/login',
     Component: LoginView,
-    index: true
   },
   {
     path: '/',
-    Component: AppLayout,
+    element: (
+      <ProtectedRoute>
+        <AppLayout />
+      </ProtectedRoute>
+    ),
     children: [
       // Home
       {
