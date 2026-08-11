@@ -1,35 +1,26 @@
-import {
-  Wallet,
-  BadgePercent,
-  Banknote,
-  QrCode
-} from "lucide-react";
+import { Wallet, BadgePercent, Banknote, QrCode } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import type { StatCash } from "@/types/cash-register/cash-register.type";
 
 interface Props {
-  stats: StatCash
+  stats: StatCash;
 }
 
 export const StatsCard = ({ stats }: Props) => {
-
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
       {/* Total ingresos */}
       <Card className="py-0">
         <CardContent className="flex items-center gap-3 p-6">
-          <div className="flex h-20 w-20 items-center justify-center rounded-xl bg-emerald-500/10">
-            <Wallet className="h-10 w-10 text-emerald-500" />
+          <div className="flex h-20 w-20 items-center justify-center rounded-xl bg-lime-500/10">
+            <Wallet className="h-10 w-10 text-lime-500" />
           </div>
 
           <div className="space-y-0.5">
-
-            <p className="text-sm text-muted-foreground">
-              Total ingresos
-            </p>
+            <p className="text-sm text-muted-foreground">Total ingresos</p>
 
             <p className="text-2xl font-bold leading-none">
-              Bs.  {stats.totalIncome.toLocaleString()}
+              Bs. {stats.totalIncome.toLocaleString()}
             </p>
 
             <p className="text-sm text-muted-foreground">
@@ -47,12 +38,10 @@ export const StatsCard = ({ stats }: Props) => {
           </div>
 
           <div className="space-y-0.5">
-            <p className="text-sm text-muted-foreground">
-              Efectivo
-            </p>
+            <p className="text-sm text-muted-foreground">Efectivo</p>
 
             <p className="text-2xl font-bold leading-none text-sky-600">
-              Bs.  {stats.cashIncome.toLocaleString()}
+              Bs. {stats.cashIncome.toLocaleString()}
             </p>
 
             <p className="text-sm text-muted-foreground">
@@ -70,17 +59,12 @@ export const StatsCard = ({ stats }: Props) => {
           </div>
 
           <div className="space-y-0.5">
-            <p className="font-semibold">
-              QR
-            </p>
+            <p className="font-semibold">QR</p>
             <p className="text-2xl font-bold leading-none text-violet-600">
-              Bs.  {stats.qrIncome.toLocaleString()}
+              Bs. {stats.qrIncome.toLocaleString()}
             </p>
 
-
-            <p className="text-sm text-muted-foreground">
-              Recibido en QR.
-            </p>
+            <p className="text-sm text-muted-foreground">Recibido en QR.</p>
           </div>
         </CardContent>
       </Card>
@@ -93,13 +77,10 @@ export const StatsCard = ({ stats }: Props) => {
           </div>
 
           <div className="space-y-0.5">
-            <p className="text-sm text-muted-foreground">
-              Movimientos
-            </p>
+            <p className="text-sm text-muted-foreground">Movimientos</p>
             <p className="text-2xl font-bold leading-none text-amber-600">
               {stats.totalMovements}
             </p>
-
 
             <p className="text-sm text-muted-foreground">
               Operaciones registradas.

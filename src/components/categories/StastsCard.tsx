@@ -1,20 +1,14 @@
-import {
-  Box,
-  CheckCircle2,
-  PackageX,
-  Tags
-} from "lucide-react";
+import { Box, CheckCircle2, PackageX, Tags } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import type { CategoriesStats } from '@/types/categories/categories.types';
+import type { CategoriesStats } from "@/types/categories/categories.types";
 
 interface Props {
-  stats: CategoriesStats
+  stats: CategoriesStats;
 }
 
 export const StatsCard = ({ stats }: Props) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
-
       {/* Total categorías */}
       <Card className="py-0">
         <CardContent className="flex items-center gap-3 p-6">
@@ -27,9 +21,7 @@ export const StatsCard = ({ stats }: Props) => {
               {stats.totalCategories}
             </p>
 
-            <p className="font-semibold">
-              Total categorías
-            </p>
+            <p className="font-semibold">Total categorías</p>
 
             <p className="text-sm text-muted-foreground">
               Todas las categorías registradas
@@ -41,8 +33,8 @@ export const StatsCard = ({ stats }: Props) => {
       {/* Categorías activas */}
       <Card className="py-0">
         <CardContent className="flex items-center gap-5 p-6">
-          <div className="flex h-20 w-20 items-center justify-center rounded-xl bg-emerald-500/10">
-            <CheckCircle2 className="h-10 w-10 text-emerald-500" />
+          <div className="flex h-20 w-20 items-center justify-center rounded-xl bg-lime-500/10">
+            <CheckCircle2 className="h-10 w-10 text-lime-500" />
           </div>
 
           <div className="space-y-0.5">
@@ -50,13 +42,9 @@ export const StatsCard = ({ stats }: Props) => {
               {stats.totalCategoriesActive}
             </p>
 
-            <p className="font-semibold">
-              Categorías activas
-            </p>
+            <p className="font-semibold">Categorías activas</p>
 
-            <p className="text-sm text-muted-foreground">
-              En uso actualmente
-            </p>
+            <p className="text-sm text-muted-foreground">En uso actualmente</p>
           </div>
         </CardContent>
       </Card>
@@ -73,9 +61,7 @@ export const StatsCard = ({ stats }: Props) => {
               {stats.totalCategoriesEmpty}
             </p>
 
-            <p className="font-semibold">
-              Categoría sin productos
-            </p>
+            <p className="font-semibold">Categoría sin productos</p>
 
             <p className="text-sm text-muted-foreground">
               Aún no tienen productos
@@ -93,12 +79,11 @@ export const StatsCard = ({ stats }: Props) => {
 
           <div className="space-y-0.5">
             <p className="text-3xl font-bold leading-none">
-              <span className="text-2xl">Bs. </span> {stats.totalInventoryValue.toLocaleString()}
+              <span className="text-2xl">Bs. </span>{" "}
+              {stats.totalInventoryValue.toLocaleString()}
             </p>
 
-            <p className="font-semibold">
-              Valor inventario
-            </p>
+            <p className="font-semibold">Valor inventario</p>
 
             <p className="text-sm text-muted-foreground">
               Costo estimado del stock
@@ -106,7 +91,6 @@ export const StatsCard = ({ stats }: Props) => {
           </div>
         </CardContent>
       </Card>
-
     </div>
   );
 };

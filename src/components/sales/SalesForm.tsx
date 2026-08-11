@@ -12,10 +12,17 @@ import {
 } from "@/components/ui/accordion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  Popover, PopoverContent, PopoverTrigger,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from "@/components/ui/popover";
 import {
-  Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
 } from "@/components/ui/command";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
@@ -32,8 +39,19 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from "@/components/ui/input-group";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
+} from "@/components/ui/input-group";
 import { Button } from "@/components/ui/button";
 
 import { cn } from "@/lib/utils";
@@ -44,9 +62,29 @@ import { generateQuotationAction } from "@/actions/reports/quotation-report.acti
 
 import { type Client } from "@/types/clients/clients.type";
 import type { CashOpen } from "@/types/cash-register/cash-register.type";
-import { salesFormSchema, type Sale, type SalesFormValues } from "@/types/sales/sales.type";
-import { ArrowRight, ArrowRightLeft, Banknote, ChevronDown, CreditCard, FileDownIcon, ListCheck, Package, QrCode, Search, ShoppingCart, Tag, Trash, User, UserCheck, UserPlus } from "lucide-react";
-
+import {
+  salesFormSchema,
+  type Sale,
+  type SalesFormValues,
+} from "@/types/sales/sales.type";
+import {
+  ArrowRight,
+  ArrowRightLeft,
+  Banknote,
+  ChevronDown,
+  CreditCard,
+  FileDownIcon,
+  ListCheck,
+  Package,
+  QrCode,
+  Search,
+  ShoppingCart,
+  Tag,
+  Trash,
+  User,
+  UserCheck,
+  UserPlus,
+} from "lucide-react";
 
 import TabsCategories from "./TabsCategories";
 import ProductItem from "./ProductItem";
@@ -55,36 +93,38 @@ import ItemsEmpty from "./ItemsEmpty";
 import ProductSaleItem from "./ProductSaleItem";
 import ServiceItem from "./ServiceItem";
 import SaleSummary from "./SaleSummary";
-
+import { printTicketAction } from "@/actions/printer-ticked/printTicketAction";
 
 interface TransactionMethods {
-  method: 'cash' | 'qr',
-  amount: number
+  method: "cash" | "qr";
+  amount: number;
 }
 
 interface Props {
-  cashRegOpen: CashOpen
+  cashRegOpen: CashOpen;
 }
 
 type ClientType = "registered" | "quick";
 
-type DiscountType = 'bs' | '%';
+type DiscountType = "bs" | "%";
 
 const paymentMethods = [
   { value: "cash", label: "Efectivo", icon: Banknote },
   { value: "qr", label: "QR", icon: QrCode },
-  { value: "mixed", label: "Múltiple", icon: ArrowRightLeft }
-]
+  { value: "mixed", label: "Múltiple", icon: ArrowRightLeft },
+];
 
 export default function SalesForm({ cashRegOpen }: Props) {
-  const [search, setSearch] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [search, setSearch] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("all");
   const [tab, setTab] = useState("detail-sale");
 
   const [clientType, setClientType] = useState<ClientType>("quick");
   const [saleData, setSaleData] = useState<Sale | undefined>(undefined);
-  const [discountType, setDiscountType] = useState<DiscountType>('bs');
-  const [discountAmount, setDiscountAmount] = useState<number | undefined>(undefined);
+  const [discountType, setDiscountType] = useState<DiscountType>("bs");
+  const [discountAmount, setDiscountAmount] = useState<number | undefined>(
+    undefined
+  );
 
   const [openSuccess, setOpenSuccess] = useState(false);
   const [clientSearch, setClientSearch] = useState(false);
@@ -95,9 +135,9 @@ export default function SalesForm({ cashRegOpen }: Props) {
 
   const defaultValues = {
     client: {
-      clientId: '',
-      name: '',
-      document: ''
+      clientId: "",
+      name: "",
+      document: "",
     },
     cashRegisterId: cashRegOpen._id,
     items: [],
@@ -105,19 +145,19 @@ export default function SalesForm({ cashRegOpen }: Props) {
     transactions: [],
     totalAmount: 0,
     globalDiscount: 0,
-    notes: '',
-  }
+    notes: "",
+  };
 
   const form = useForm<SalesFormValues>({
     resolver: zodResolver(salesFormSchema),
-    defaultValues
+    defaultValues,
   });
 
   const { data: ProductsCatalog, refetch } = useQuery({
-    queryKey: ['products-catalog'],
+    queryKey: ["products-catalog"],
     queryFn: () => filterWithCategoryAction(categoryFilter),
-    retry: false
-  })
+    retry: false,
+  });
 
   const client = form.watch("client");
   const items = form.watch("items");
@@ -125,12 +165,14 @@ export default function SalesForm({ cashRegOpen }: Props) {
   const amountProducts = items.reduce((sum, i) => sum + i.subtotal, 0);
   const amountServices = services.reduce((sum, i) => sum + i.amount, 0);
 
-
-
-  const calculateGlobalDiscount = (total: number, type: DiscountType, value: number) => {
+  const calculateGlobalDiscount = (
+    total: number,
+    type: DiscountType,
+    value: number
+  ) => {
     if (value <= 0) return 0;
 
-    if (type === 'bs') {
+    if (type === "bs") {
       return Math.min(value, total);
     } else {
       const percentage = Math.min(value, 100);
@@ -140,17 +182,17 @@ export default function SalesForm({ cashRegOpen }: Props) {
   };
 
   const handleDiscountAmount = (value: string | number) => {
-    if (value === '' || value === null || value === undefined) {
+    if (value === "" || value === null || value === undefined) {
       setDiscountAmount(undefined);
-      form.setValue('globalDiscount', 0);
+      form.setValue("globalDiscount", 0);
       return;
-    };
+    }
     const numericValue = Number(value);
     if (isNaN(numericValue)) {
       return;
     }
     setDiscountAmount(numericValue);
-  }
+  };
 
   const handleCashChange = (value: string) => {
     if (value === "" || value === null || value === undefined) {
@@ -178,32 +220,27 @@ export default function SalesForm({ cashRegOpen }: Props) {
       discountType,
       discountAmount
     );
-    form.setValue('globalDiscount', applyDiscount);
-    return applyDiscount
-  }, [
-    amountProducts,
-    amountServices,
-    discountAmount,
-    discountType
-  ]);
+    form.setValue("globalDiscount", applyDiscount);
+    return applyDiscount;
+  }, [amountProducts, amountServices, discountAmount, discountType]);
 
   const totalAmount = amountProducts + amountServices - globalDiscount;
 
   useEffect(() => {
-    form.setValue('totalAmount', totalAmount);
-  }, [totalAmount])
+    form.setValue("totalAmount", totalAmount);
+  }, [totalAmount]);
 
   useEffect(() => {
     refetch();
-  }, [categoryFilter])
+  }, [categoryFilter]);
 
   useEffect(() => {
-    if (metodoPago === 'cash') {
+    if (metodoPago === "cash") {
       setCashAmount(totalAmount);
       setQrAmount(0);
     }
 
-    if (metodoPago === 'qr') {
+    if (metodoPago === "qr") {
       setCashAmount(0);
       setQrAmount(totalAmount);
     }
@@ -212,33 +249,29 @@ export default function SalesForm({ cashRegOpen }: Props) {
   useEffect(() => {
     let transactions: TransactionMethods[] = [];
 
-    if (metodoPago === 'cash')
-      transactions = [{ method: 'cash', amount: totalAmount }];
+    if (metodoPago === "cash")
+      transactions = [{ method: "cash", amount: totalAmount }];
 
-    if (metodoPago === 'qr')
-      transactions = [{ method: 'qr', amount: totalAmount }];
+    if (metodoPago === "qr")
+      transactions = [{ method: "qr", amount: totalAmount }];
 
-    if (metodoPago === 'mixed') {
+    if (metodoPago === "mixed") {
       transactions = [];
 
       if (cashAmount && cashAmount > 0)
-        transactions.push({ method: 'cash', amount: cashAmount });
+        transactions.push({ method: "cash", amount: cashAmount });
 
-      if (qrAmount > 0)
-        transactions.push({ method: 'qr', amount: qrAmount });
+      if (qrAmount > 0) transactions.push({ method: "qr", amount: qrAmount });
     }
 
-    form.setValue('transactions', transactions, { shouldValidate: true });
-
+    form.setValue("transactions", transactions, { shouldValidate: true });
   }, [metodoPago, cashAmount, qrAmount, totalAmount]);
 
   const filteredProducts = useMemo(() => {
     return ProductsCatalog?.filter((product) => {
       // filtro categoría
       const matchCategory =
-        categoryFilter === 'all'
-          ? true
-          : product.category === categoryFilter;
+        categoryFilter === "all" ? true : product.category === categoryFilter;
 
       // búsqueda
       const query = search.toLowerCase();
@@ -253,7 +286,6 @@ export default function SalesForm({ cashRegOpen }: Props) {
     });
   }, [ProductsCatalog, categoryFilter, search]);
 
-
   const handleCategoryFilter = (value: string) => {
     setCategoryFilter(value);
   };
@@ -263,7 +295,7 @@ export default function SalesForm({ cashRegOpen }: Props) {
     form.setValue("client.name", client.razonSocial);
     form.setValue("client.document", client.documentoId);
     setClientSearch(false);
-  }
+  };
 
   const handleSetClient = (value: ClientType) => {
     setClientType(value);
@@ -272,21 +304,21 @@ export default function SalesForm({ cashRegOpen }: Props) {
       client: {
         clientId: "",
         name: "",
-        document: ""
-      }
+        document: "",
+      },
     });
-  }
+  };
 
   const handleRemoveSale = () => {
-    setDiscountType('bs')
+    setDiscountType("bs");
     setTab("detail-sale");
-    setMetodoPago('cash')
-    setClientType('quick')
-    setCategoryFilter('all')
-    setSearch('')
-    setDiscountAmount(undefined)
-    form.reset(defaultValues)
-  }
+    setMetodoPago("cash");
+    setClientType("quick");
+    setCategoryFilter("all");
+    setSearch("");
+    setDiscountAmount(undefined);
+    form.reset(defaultValues);
+  };
 
   const { mutate } = useMutation({
     mutationFn: registerSaleAction,
@@ -296,8 +328,8 @@ export default function SalesForm({ cashRegOpen }: Props) {
     onSuccess: (sale) => {
       setSaleData(sale);
       setOpenSuccess(true);
-      handleRemoveSale()
-    }
+      handleRemoveSale();
+    },
   });
 
   const { mutate: mutatedQuotation } = useMutation({
@@ -306,30 +338,44 @@ export default function SalesForm({ cashRegOpen }: Props) {
       toast.error(error.message);
     },
     onSuccess: () => {
-      toast.success('Se descargó correctamente');
-    }
+      toast.success("Se descargó correctamente");
+    },
+  });
+
+  const { mutate: mutatedPrinterTicked } = useMutation({
+    mutationFn: printTicketAction,
+    onError: (error: TypeError) => {
+      toast.error(error.message);
+    },
+    onSuccess: () => {
+      setOpenSuccess(false);
+    },
   });
 
   const handleQuotation = () => {
     const data = {
-      client: form.getValues('client'),
-      items: form.getValues('items'),
-      services: form.getValues('services'),
-      globalDiscount: form.getValues('globalDiscount'),
-      totalAmount: form.getValues('totalAmount')
-    }
-    mutatedQuotation(data)
-  }
+      client: form.getValues("client"),
+      items: form.getValues("items"),
+      services: form.getValues("services"),
+      globalDiscount: form.getValues("globalDiscount"),
+      totalAmount: form.getValues("totalAmount"),
+    };
+    mutatedQuotation(data);
+  };
 
   const onSubmit = (formData: SalesFormValues) => {
-    mutate(formData)
-  }
+    mutate(formData);
+  };
 
-  const disabledSale = items.length === 0 && services.length === 0 ? true : false
+  const disabledSale =
+    items.length === 0 && services.length === 0 ? true : false;
 
   return (
     <>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="grid grid-cols-1 lg:grid-cols-12 gap-5"
+      >
         <Tabs defaultValue="products" className="lg:col-span-8">
           <TabsList variant="line">
             <TabsTrigger value="products">Productos</TabsTrigger>
@@ -371,7 +417,7 @@ export default function SalesForm({ cashRegOpen }: Props) {
 
                 {filteredProducts?.length ? (
                   <div
-                  className="
+                    className="
                     mt-5
                     grid
                     gap-4
@@ -379,7 +425,7 @@ export default function SalesForm({ cashRegOpen }: Props) {
                     max-h-[550px]
                     overflow-y-auto
                   "
-                >
+                  >
                     {filteredProducts?.map((p) => (
                       <ProductItem
                         key={p._id}
@@ -390,7 +436,9 @@ export default function SalesForm({ cashRegOpen }: Props) {
                     ))}
                   </div>
                 ) : (
-                  <p className=" py-10 text-sm text-center text-muted-foreground">Sin productos para mostrar</p>
+                  <p className=" py-10 text-sm text-center text-muted-foreground">
+                    Sin productos para mostrar
+                  </p>
                 )}
               </CardContent>
             </Card>
@@ -407,11 +455,20 @@ export default function SalesForm({ cashRegOpen }: Props) {
         </Tabs>
 
         {/* Right Panel - Summary | Client | Payment Sale */}
-        <Tabs defaultValue={tab} value={tab} onValueChange={setTab} className="lg:col-span-4">
-          <TabsList variant={'default'} className="w-full">
+        <Tabs
+          defaultValue={tab}
+          value={tab}
+          onValueChange={setTab}
+          className="lg:col-span-4"
+        >
+          <TabsList variant={"default"} className="w-full">
             <TabsTrigger value="detail-sale">Detalle</TabsTrigger>
-            <TabsTrigger disabled={disabledSale} value="client" >Cliente</TabsTrigger>
-            <TabsTrigger disabled={disabledSale} value="payment">Pago</TabsTrigger>
+            <TabsTrigger disabled={disabledSale} value="client">
+              Cliente
+            </TabsTrigger>
+            <TabsTrigger disabled={disabledSale} value="payment">
+              Pago
+            </TabsTrigger>
           </TabsList>
 
           {/* Detalle de venta */}
@@ -442,7 +499,6 @@ export default function SalesForm({ cashRegOpen }: Props) {
               {disabledSale ? (
                 <CardContent>
                   <div className="flex flex-col items-center justify-center text-center border-2 border-dashed rounded-xl py-12 px-6 bg-muted/20">
-
                     <ShoppingCart className="h-10 w-10 text-muted-foreground mb-4" />
 
                     <h3 className="font-semibold text-lg">
@@ -450,7 +506,8 @@ export default function SalesForm({ cashRegOpen }: Props) {
                     </h3>
 
                     <p className="text-sm text-muted-foreground mt-1 max-w-[260px]">
-                      Agrega productos o servicios para comenzar una nueva venta.
+                      Agrega productos o servicios para comenzar una nueva
+                      venta.
                     </p>
                   </div>
                 </CardContent>
@@ -476,9 +533,7 @@ export default function SalesForm({ cashRegOpen }: Props) {
                             ))}
                           </div>
                         ) : (
-                          <ItemsEmpty>
-                            No hay productos agregados
-                          </ItemsEmpty>
+                          <ItemsEmpty>No hay productos agregados</ItemsEmpty>
                         )}
                       </CardContent>
                       <Separator />
@@ -505,9 +560,7 @@ export default function SalesForm({ cashRegOpen }: Props) {
                             ))}
                           </div>
                         ) : (
-                          <ItemsEmpty>
-                            No hay servicios agregados
-                          </ItemsEmpty>
+                          <ItemsEmpty>No hay servicios agregados</ItemsEmpty>
                         )}
                       </CardContent>
                       <Separator />
@@ -516,7 +569,12 @@ export default function SalesForm({ cashRegOpen }: Props) {
 
                   {/* DESCUENTO */}
                   <CardContent>
-                    <Accordion type="single" collapsible defaultValue="" className="w-full">
+                    <Accordion
+                      type="single"
+                      collapsible
+                      defaultValue=""
+                      className="w-full"
+                    >
                       <AccordionItem value="discount" className="border-none">
                         <AccordionTrigger className="py-0 hover:no-underline">
                           <div className="flex items-center gap-2">
@@ -540,13 +598,9 @@ export default function SalesForm({ cashRegOpen }: Props) {
                               </SelectTrigger>
 
                               <SelectContent>
-                                <SelectItem value="bs">
-                                  Bs.
-                                </SelectItem>
+                                <SelectItem value="bs">Bs.</SelectItem>
 
-                                <SelectItem value="%">
-                                  %
-                                </SelectItem>
+                                <SelectItem value="%">%</SelectItem>
                               </SelectContent>
                             </Select>
 
@@ -554,8 +608,10 @@ export default function SalesForm({ cashRegOpen }: Props) {
                               className="flex-1"
                               type="number"
                               placeholder="0"
-                              value={discountAmount ?? ''}
-                              onChange={(e) => handleDiscountAmount(e.target.value)}
+                              value={discountAmount ?? ""}
+                              onChange={(e) =>
+                                handleDiscountAmount(e.target.value)
+                              }
                             />
                           </div>
                         </AccordionContent>
@@ -578,7 +634,7 @@ export default function SalesForm({ cashRegOpen }: Props) {
                       type="button"
                       className="w-full mt-2"
                       onClick={() => setTab("client")}
-                      size={'lg'}
+                      size={"lg"}
                     >
                       Continuar
                       <ArrowRight className="h-4 w-4 ml-1" />
@@ -604,64 +660,60 @@ export default function SalesForm({ cashRegOpen }: Props) {
                 <div className="flex gap-2">
                   <button
                     type="button"
-                    onClick={() => handleSetClient('quick')}
-                    disabled={
-                      items.length === 0 &&
-                      services.length === 0
-                    }
-                    className={cn(`
+                    onClick={() => handleSetClient("quick")}
+                    disabled={items.length === 0 && services.length === 0}
+                    className={cn(
+                      `
                       flex-1
                               rounded-xl border
                               p-2 flex flex-col
                               items-center justify-center
                               gap-2 transition-all duration-200
-                            `, clientType === "quick"
-                      ? `
+                            `,
+                      clientType === "quick"
+                        ? `
                                 border-primary 
                                 bg-primary/10
                                 text-primary
                                 shadow-sm
                               `
-                      : `
+                        : `
                                 hover:border-primary/40
                                 hover:bg-mutated/40
-                              `)}
+                              `
+                    )}
                   >
                     <UserPlus className="h-5 w-5" />
-                    <span className="text-sm font-medium">
-                      Sin registro
-                    </span>
+                    <span className="text-sm font-medium">Sin registro</span>
                   </button>
 
                   <button
                     type="button"
-                    onClick={() => handleSetClient('registered')}
-                    disabled={
-                      items.length === 0 &&
-                      services.length === 0
-                    }
-                    className={cn(`
+                    onClick={() => handleSetClient("registered")}
+                    disabled={items.length === 0 && services.length === 0}
+                    className={cn(
+                      `
                               flex-1
                               rounded-xl border
                               p-2 flex flex-col
                               items-center justify-center
                               gap-2 transition-all duration-200
-                            `, clientType === "registered"
-                      ? `
+                            `,
+                      clientType === "registered"
+                        ? `
                                 border-primary 
                                 bg-primary/10
                                 text-primary
                                 shadow-sm
                               `
-                      : `
+                        : `
                                 hover:border-primary/40
                                 hover:bg-mutated/40
-                              `)}
+                              `
+                    )}
                   >
                     <UserCheck className="h-5 w-5" />
-                    <span className="text-sm font-medium">
-                      Registrado
-                    </span>
+                    <span className="text-sm font-medium">Registrado</span>
                   </button>
                 </div>
 
@@ -677,9 +729,7 @@ export default function SalesForm({ cashRegOpen }: Props) {
                           {client?.clientId ? (
                             <>
                               <User className="h-4 w-4 text-muted-foreground" />
-                              <span className="truncate">
-                                {client.name}
-                              </span>
+                              <span className="truncate">{client.name}</span>
                             </>
                           ) : (
                             <>
@@ -691,7 +741,11 @@ export default function SalesForm({ cashRegOpen }: Props) {
                           )}
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent className="p-0" style={{ width: 'var(--radix-popover-trigger-width)' }} align="start">
+                      <PopoverContent
+                        className="p-0"
+                        style={{ width: "var(--radix-popover-trigger-width)" }}
+                        align="start"
+                      >
                         <Command>
                           <CommandInput placeholder="Nombre o NIT..." />
                           <CommandList className="max-h-48">
@@ -699,7 +753,7 @@ export default function SalesForm({ cashRegOpen }: Props) {
                             <CommandGroup>
                               {listClients?.clients && (
                                 <>
-                                  {listClients.clients.map(c => (
+                                  {listClients.clients.map((c) => (
                                     <CommandItem
                                       key={c._id}
                                       value={`${c.razonSocial} ${c.documentoId}`}
@@ -707,8 +761,15 @@ export default function SalesForm({ cashRegOpen }: Props) {
                                       className="cursor-pointer"
                                     >
                                       <div className="flex flex-col">
-                                        <span className="font-medium text-sm">{c.razonSocial}</span>
-                                        <span className="text-xs text-muted-foreground">{c.tipoDocumento === 'nit' ? 'NIT:' : 'CI:'}{c.documentoId}</span>
+                                        <span className="font-medium text-sm">
+                                          {c.razonSocial}
+                                        </span>
+                                        <span className="text-xs text-muted-foreground">
+                                          {c.tipoDocumento === "nit"
+                                            ? "NIT:"
+                                            : "CI:"}
+                                          {c.documentoId}
+                                        </span>
                                       </div>
                                     </CommandItem>
                                   ))}
@@ -727,13 +788,13 @@ export default function SalesForm({ cashRegOpen }: Props) {
                       name="client.name"
                       render={({ field, fieldState }) => (
                         <Field data-invalid={fieldState.invalid}>
-                          <FieldLabel htmlFor={field.name}>Nombre / Razón Social </FieldLabel>
-                          <Input
-                            {...field}
-                            id={field.name}
-                            placeholder="S/N"
-                          />
-                          {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                          <FieldLabel htmlFor={field.name}>
+                            Nombre / Razón Social{" "}
+                          </FieldLabel>
+                          <Input {...field} id={field.name} placeholder="S/N" />
+                          {fieldState.invalid && (
+                            <FieldError errors={[fieldState.error]} />
+                          )}
                         </Field>
                       )}
                     />
@@ -743,19 +804,18 @@ export default function SalesForm({ cashRegOpen }: Props) {
                       name="client.document"
                       render={({ field, fieldState }) => (
                         <Field data-invalid={fieldState.invalid}>
-                          <FieldLabel htmlFor={field.name}>NIT / CI (opcional)</FieldLabel>
-                          <Input
-                            {...field}
-                            id={field.name}
-                            placeholder="S/N"
-                          />
-                          {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                          <FieldLabel htmlFor={field.name}>
+                            NIT / CI (opcional)
+                          </FieldLabel>
+                          <Input {...field} id={field.name} placeholder="S/N" />
+                          {fieldState.invalid && (
+                            <FieldError errors={[fieldState.error]} />
+                          )}
                         </Field>
                       )}
                     />
                   </div>
                 )}
-
               </CardContent>
 
               <Separator />
@@ -768,7 +828,6 @@ export default function SalesForm({ cashRegOpen }: Props) {
                 globalDiscount={globalDiscount}
                 totalAmount={totalAmount}
               >
-
                 <div className="flex gap-2">
                   <Button
                     type="button"
@@ -783,7 +842,7 @@ export default function SalesForm({ cashRegOpen }: Props) {
                   <Button
                     type="button"
                     className="flex-1"
-                    size={'lg'}
+                    size={"lg"}
                     onClick={() => setTab("payment")}
                   >
                     Continuar <ArrowRight />
@@ -809,47 +868,46 @@ export default function SalesForm({ cashRegOpen }: Props) {
 
                   <div className="grid grid-cols-3 gap-3">
                     {paymentMethods.map((method) => {
-                      const Icon = method.icon
-                      const active = metodoPago === method.value
+                      const Icon = method.icon;
+                      const active = metodoPago === method.value;
 
                       return (
                         <button
                           key={method.value}
                           type="button"
                           onClick={() => setMetodoPago(method.value)}
-                          disabled={
-                            items.length === 0 &&
-                            services.length === 0
-                          }
-                          className={cn(`
+                          disabled={items.length === 0 && services.length === 0}
+                          className={cn(
+                            `
                               rounded-xl border
                               p-2 flex flex-col
                               items-center justify-center
                               gap-2 transition-all duration-200
-                            `, active
-                            ? `
+                            `,
+                            active
+                              ? `
                                 border-primary 
                                 bg-primary/10
                                 text-primary
                                 shadow-sm
                               `
-                            : `
+                              : `
                                 hover:border-primary/40
                                 hover:bg-mutated/40
-                              `)}
+                              `
+                          )}
                         >
                           <Icon className="h-4 w-5" />
                           <span className="text-sm font-medium">
                             {method.label}
                           </span>
                         </button>
-                      )
+                      );
                     })}
                   </div>
                 </div>
 
-
-                {metodoPago === 'mixed' && (
+                {metodoPago === "mixed" && (
                   <div className="flex gap-2 justify-between">
                     <Field>
                       <FieldLabel htmlFor="cash-amount">Efectivo</FieldLabel>
@@ -859,7 +917,7 @@ export default function SalesForm({ cashRegOpen }: Props) {
                           type="number"
                           max={totalAmount}
                           placeholder="0"
-                          value={cashAmount ?? ''}
+                          value={cashAmount ?? ""}
                           onChange={(e) => handleCashChange(e.target.value)}
                         />
                         <InputGroupAddon>
@@ -890,16 +948,20 @@ export default function SalesForm({ cashRegOpen }: Props) {
                   name="notes"
                   render={({ field, fieldState }) => (
                     <Field data-invalid={fieldState.invalid}>
-                      <FieldLabel htmlFor={field.name}>Nota (Opcional)</FieldLabel>
+                      <FieldLabel htmlFor={field.name}>
+                        Nota (Opcional)
+                      </FieldLabel>
                       <Textarea
                         {...field}
                         id={field.name}
                         aria-invalid={fieldState.invalid}
                         placeholder="Observaciones..."
                         autoComplete="off"
-                        className='bg-secondary/50'
+                        className="bg-secondary/50"
                       />
-                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
                     </Field>
                   )}
                 />
@@ -917,11 +979,10 @@ export default function SalesForm({ cashRegOpen }: Props) {
               >
                 <Button
                   className="w-full"
-                  size={'lg'}
-                  onClick={() => { 'click me' }}
+                  size={"lg"}
                   disabled={items.length === 0 && services.length === 0}
                 >
-                  <ShoppingCart />  Registrar Venta
+                  <ShoppingCart /> Registrar Venta
                 </Button>
               </SaleSummary>
             </Card>
@@ -936,23 +997,27 @@ export default function SalesForm({ cashRegOpen }: Props) {
             <DialogDescription>Venta procesada exitosamente</DialogDescription>
           </DialogHeader>
           <div className="text-sm space-y-1">
-            <p><strong>Código:</strong> {saleData?.code}</p>
-            <p><strong>Total:</strong> Bs {saleData?.totalAmount}</p>
+            <p>
+              <strong>Código:</strong> {saleData?.code}
+            </p>
+            <p>
+              <strong>Total:</strong> Bs {saleData?.totalAmount}
+            </p>
           </div>
           <DialogFooter>
             <DialogClose asChild>
               <Button variant="outline">Cerrar</Button>
             </DialogClose>
 
-            {/* <Button
+            <Button
               type="submit"
-              onClick={() => { console.log('Imprimir recibo') }}
+              onClick={() => mutatedPrinterTicked(saleData!)}
             >
               Imprimir Recibo
-            </Button> */}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
     </>
-  )
+  );
 }

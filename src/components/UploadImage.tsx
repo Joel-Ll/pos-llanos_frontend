@@ -1,23 +1,23 @@
-import { useCallback, type Dispatch, type SetStateAction } from 'react';
-import type { UseFormReturn } from 'react-hook-form';
-import { useMutation } from '@tanstack/react-query';
-import { useDropzone } from 'react-dropzone';
-import { toast } from 'sonner';
-import { Upload, X } from 'lucide-react';
+import { useCallback, type Dispatch, type SetStateAction } from "react";
+import type { UseFormReturn } from "react-hook-form";
+import { useMutation } from "@tanstack/react-query";
+import { useDropzone } from "react-dropzone";
+import { toast } from "sonner";
+import { Upload, X } from "lucide-react";
 
-import { Spinner } from '@/components/ui/spinner';
-import { Button } from '@/components/ui/button';
-import { FormLabel } from '@/components/ui/form';
-import type { ProductFormValues } from '@/types/products/products.type';
-import { deleteImageAction } from '@/actions/products/delete-image.action';
-import { uploadImageAction } from '@/actions/products/upload-image.action';
+import { Spinner } from "@/components/ui/spinner";
+import { Button } from "@/components/ui/button";
+import { FormLabel } from "@/components/ui/form";
+import type { ProductFormValues } from "@/types/products/products.type";
+import { deleteImageAction } from "@/actions/products/delete-image.action";
+import { uploadImageAction } from "@/actions/products/upload-image.action";
 
 interface Props {
   publicId: string | undefined;
   setPublicId: Dispatch<SetStateAction<string | undefined>>;
   imagePreview: string | undefined;
   setImagePreview: Dispatch<SetStateAction<string | undefined>>;
-  form: UseFormReturn<ProductFormValues>
+  form: UseFormReturn<ProductFormValues>;
 }
 
 export default function UploadImage({
@@ -25,47 +25,52 @@ export default function UploadImage({
   publicId,
   setPublicId,
   imagePreview,
-  setImagePreview
+  setImagePreview,
 }: Props) {
-
   const { mutate, isPending } = useMutation({
     mutationFn: uploadImageAction,
     onError: (error: TypeError) => toast.error(error.message),
     onSuccess: (data) => {
       setImagePreview(data?.secure_url);
-      setPublicId(data?.public_id)
-      form.setValue('image', data?.secure_url)
-    }
+      setPublicId(data?.public_id);
+      form.setValue("image", data?.secure_url);
+    },
   });
 
   const { mutate: mutateDelete, isPending: isPendingDelete } = useMutation({
     mutationFn: deleteImageAction,
     onError: (error: TypeError) => toast.error(error.message),
     onSuccess: () => {
-      setPublicId('');
+      setPublicId("");
       setImagePreview(undefined);
-      form.setValue('image', '');
-    }
+      form.setValue("image", "");
+    },
   });
 
   const onDrop = useCallback(async (files: File[]) => {
     const formData = new FormData();
     files.forEach((file) => {
-      formData.append('file', file)
+      formData.append("file", file);
     });
     mutate(formData);
-  }, [])
+  }, []);
 
-  const { getRootProps, getInputProps, isDragActive, isDragReject, isDragAccept } = useDropzone({
+  const {
+    getRootProps,
+    getInputProps,
+    isDragActive,
+    isDragReject,
+    isDragAccept,
+  } = useDropzone({
     accept: {
-      'image/jpeg': ['.jpg'],
-      'image/png': ['.png'],
-      'image/webp': ['.webp'],
-      'image/avif': ['.avif'],
+      "image/jpeg": [".jpg"],
+      "image/png": [".png"],
+      "image/webp": [".webp"],
+      "image/avif": [".avif"],
     },
     onDrop,
-    maxFiles: 1
-  })
+    maxFiles: 1,
+  });
 
   return (
     <>
@@ -74,13 +79,14 @@ export default function UploadImage({
         <div
           {...getRootProps({
             className: `border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors
-        ${isDragActive
-                ? 'border-blue-500 bg-blue-50 text-blue-900'
-                : isDragReject
-                  ? 'border-red-500 bg-red-50 text-red-900'
-                  : 'border-border text-muted-foreground hover:border-primary hover:bg-muted/50'
-              }
-      `
+        ${
+          isDragActive
+            ? "border-blue-500 bg-blue-50 text-blue-900"
+            : isDragReject
+            ? "border-red-500 bg-red-50 text-red-900"
+            : "border-border text-muted-foreground hover:border-primary hover:bg-muted/50"
+        }
+      `,
           })}
         >
           <input {...getInputProps()} />
@@ -100,7 +106,7 @@ export default function UploadImage({
                 onClick={(e) => {
                   e.stopPropagation();
                   if (publicId) {
-                    mutateDelete(publicId)
+                    mutateDelete(publicId);
                   }
                 }}
               >
@@ -112,16 +118,16 @@ export default function UploadImage({
               {isDragAccept && (
                 <>
                   <Upload className="h-12 w-12 text-blue-500" />
-                  <p className="text-blue-700 font-medium">Suelta la imagen aquí</p>
+                  <p className="text-blue-700 font-medium">
+                    Suelta la imagen aquí
+                  </p>
                 </>
               )}
 
               {isDragReject && (
                 <>
                   <X className="h-12 w-12 text-red-500" />
-                  <p className="text-red-700 font-medium">
-                    Archivo no válido.
-                  </p>
+                  <p className="text-red-700 font-medium">Archivo no válido.</p>
                 </>
               )}
 
@@ -152,5 +158,5 @@ export default function UploadImage({
         )}
       </div>
     </>
-  )
+  );
 }

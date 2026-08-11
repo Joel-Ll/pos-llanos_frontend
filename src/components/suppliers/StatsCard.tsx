@@ -1,18 +1,12 @@
-import {
-  Truck,
-  ClipboardCheck,
-  Star,
-  CircleDollarSign
-} from "lucide-react";
+import { Truck, ClipboardCheck, Star, CircleDollarSign } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import type { SupplierStats } from '@/types/suppliers/suppliers.type';
+import type { SupplierStats } from "@/types/suppliers/suppliers.type";
 
 interface Props {
-  stats: SupplierStats
+  stats: SupplierStats;
 }
 
 export const StatsCard = ({ stats }: Props) => {
-
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
       <Card className="py-0">
@@ -26,9 +20,7 @@ export const StatsCard = ({ stats }: Props) => {
               {stats.totalSuppliers}
             </p>
 
-            <p className="font-semibold">
-              Total proveedores
-            </p>
+            <p className="font-semibold">Total proveedores</p>
 
             <p className="text-sm text-muted-foreground">
               Proveedores registrados
@@ -39,8 +31,8 @@ export const StatsCard = ({ stats }: Props) => {
 
       <Card className="py-0">
         <CardContent className="flex items-center gap-5 p-6">
-          <div className="flex h-20 w-20 items-center justify-center rounded-xl bg-emerald-500/10">
-            <ClipboardCheck className="h-10 w-10 text-emerald-500" />
+          <div className="flex h-20 w-20 items-center justify-center rounded-xl bg-lime-500/10">
+            <ClipboardCheck className="h-10 w-10 text-lime-500" />
           </div>
 
           <div className="space-y-0.5">
@@ -48,9 +40,7 @@ export const StatsCard = ({ stats }: Props) => {
               {stats.activeSuppliers}
             </p>
 
-            <p className="font-semibold">
-              Proveedores activos
-            </p>
+            <p className="font-semibold">Proveedores activos</p>
 
             <p className="text-sm text-muted-foreground">
               Disponibles para compras
@@ -71,24 +61,17 @@ export const StatsCard = ({ stats }: Props) => {
                 {stats.topSupplier.enterprise}
               </p>
 
-              <p className="font-semibold">
-                Proveedor más utilizado
-              </p>
+              <p className="font-semibold">Proveedor más utilizado</p>
 
               <p className="text-sm text-muted-foreground">
                 {stats.topSupplier.purchases} compras realizadas
               </p>
             </div>
-
           ) : (
             <div className="space-y-0.5">
-              <p className="text-2xl font-bold leading-none">
-                --
-              </p>
+              <p className="text-2xl font-bold leading-none">--</p>
 
-              <p className="font-semibold">
-                Sin registro
-              </p>
+              <p className="font-semibold">Sin registro</p>
 
               <p className="text-sm text-muted-foreground">
                 sin regisro de proveedores
@@ -107,12 +90,11 @@ export const StatsCard = ({ stats }: Props) => {
 
           <div className="space-y-0.5">
             <p className="text-3xl font-bold leading-none">
-              <span className="text-2xl">Bs. </span> {stats.totalAmount.toLocaleString()}
+              <span className="text-2xl">Bs. </span>{" "}
+              {stats.totalAmount.toLocaleString()}
             </p>
 
-            <p className="font-semibold">
-              Total comprado
-            </p>
+            <p className="font-semibold">Total comprado</p>
 
             <p className="text-sm text-muted-foreground">
               Histórico de compras
@@ -121,5 +103,5 @@ export const StatsCard = ({ stats }: Props) => {
         </CardContent>
       </Card>
     </div>
-  )
-}
+  );
+};

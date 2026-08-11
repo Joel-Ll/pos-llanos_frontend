@@ -1,15 +1,29 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router'
-import type { ColumnDef } from "@tanstack/react-table"
+import { useState } from "react";
+import { useNavigate } from "react-router";
+import type { ColumnDef } from "@tanstack/react-table";
 
-import { CheckCircle, Edit2, Eye, MoreHorizontal, Package, Tag, Truck, XCircle } from 'lucide-react'
-import { Badge } from '@/components/ui/badge'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { Button } from '@/components/ui/button'
-import type { Product } from '@/types/products/products.type'
-import CardProduct from './CardProduct'
-import { ChangeState } from './ChangeState'
-import { getThumbnailUrl } from '@/utils'
+import {
+  CheckCircle,
+  Edit2,
+  Eye,
+  MoreHorizontal,
+  Package,
+  Tag,
+  Truck,
+  XCircle,
+} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import type { Product } from "@/types/products/products.type";
+import CardProduct from "./CardProduct";
+import { ChangeState } from "./ChangeState";
+import { getThumbnailUrl } from "@/utils";
 
 export const columns: ColumnDef<Product>[] = [
   // Imagen
@@ -47,7 +61,10 @@ export const columns: ColumnDef<Product>[] = [
               </p>
 
               <p className="text-sm text-muted-foreground truncate">
-                #{row.original.internalCode} • {row.original.catalogCode === '' ? 's/n' : row.original.catalogCode}
+                #{row.original.internalCode} •{" "}
+                {row.original.catalogCode === ""
+                  ? "s/n"
+                  : row.original.catalogCode}
               </p>
             </div>
           </div>
@@ -67,9 +84,10 @@ export const columns: ColumnDef<Product>[] = [
     header: "Marca",
     cell: ({ row }) => (
       <Badge variant="outline" className="text-xs">
-        <Tag className="h-3 w-3 mr-1" />{row.original.brand}
+        <Tag className="h-3 w-3 mr-1" />
+        {row.original.brand}
       </Badge>
-    )
+    ),
   },
   // Ubicacion
   {
@@ -77,8 +95,10 @@ export const columns: ColumnDef<Product>[] = [
     header: "Ubicación",
     cell: ({ row }) => {
       return (
-        <div className="text-muted-foreground text-md">{row.original.location === '' ? 's/n' : row.original.location}</div>
-      )
+        <div className="text-muted-foreground text-md">
+          {row.original.location === "" ? "s/n" : row.original.location}
+        </div>
+      );
     },
   },
 
@@ -87,9 +107,7 @@ export const columns: ColumnDef<Product>[] = [
     accessorKey: "category",
     header: "Categoría",
     cell: ({ row }) => {
-      return (
-        <Badge variant={'secondary'}>{row.original.category.name}</Badge>
-      )
+      return <Badge variant={"secondary"}>{row.original.category.name}</Badge>;
     },
     filterFn: (row, _, filterValue) => {
       const categoryId = row.original.category._id;
@@ -105,46 +123,51 @@ export const columns: ColumnDef<Product>[] = [
         <Truck className="h-3 w-3 text-muted-foreground" />
         {row.original.supplier.enterprise}
       </div>
-    )
+    ),
   },
 
   // Stock
   {
     accessorKey: "currentStock",
-    header: () => <div className='text-center'>Stock</div>,
+    header: () => <div className="text-center">Stock</div>,
     cell: ({ row }) => {
       const { currentStock, minStock } = row.original;
       return (
-        <div className='text-center'>
-          <Badge variant={
-            currentStock === 0 ? "destructive" :
-              currentStock <= minStock ? "secondary" : "default"
-          }>
+        <div className="text-center">
+          <Badge
+            variant={
+              currentStock === 0
+                ? "destructive"
+                : currentStock <= minStock
+                ? "secondary"
+                : "default"
+            }
+          >
             {currentStock}
           </Badge>
         </div>
-      )
-    }
+      );
+    },
   },
   // P. Venta
   {
     accessorKey: "salePrice",
-    header: () => <div className='text-right'>P. Venta</div>,
+    header: () => <div className="text-right">P. Venta</div>,
     cell: ({ row }) => (
       <div className="text-right font-semibold">
         Bs {row.original.salePrice.toLocaleString()}
       </div>
-    )
+    ),
   },
   // Estado
   {
     accessorKey: "isActive",
-    header: () => <div className='text-center'>Estado</div>,
+    header: () => <div className="text-center">Estado</div>,
     cell: ({ row }) => {
-      const isActive = row.original.isActive
+      const isActive = row.original.isActive;
 
       return (
-        <div className='text-center'>
+        <div className="text-center">
           {isActive ? (
             <Badge className="bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300">
               Activo
@@ -155,15 +178,15 @@ export const columns: ColumnDef<Product>[] = [
             </Badge>
           )}
         </div>
-      )
-    }
+      );
+    },
   },
   // Acciones
   {
     id: "Acciones",
     cell: ({ row }) => {
       const navigate = useNavigate();
-      const productId = row.original._id
+      const productId = row.original._id;
       const [openChange, setOpenChange] = useState(false);
 
       return (
@@ -176,17 +199,26 @@ export const columns: ColumnDef<Product>[] = [
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => navigate(`/products/detail/${productId}`)} >
+              <DropdownMenuItem
+                onClick={() => navigate(`/products/detail/${productId}`)}
+              >
                 <Eye />
                 Ver
               </DropdownMenuItem>
 
-              <DropdownMenuItem onClick={() => navigate(`/products/edit/${productId}`)} >
+              <DropdownMenuItem
+                onClick={() => navigate(`/products/edit/${productId}`)}
+              >
                 <Edit2 />
                 Editar
               </DropdownMenuItem>
 
-              <DropdownMenuItem variant={row.original.isActive === true ? 'destructive' : 'default'} onClick={() => setOpenChange(true)}>
+              <DropdownMenuItem
+                variant={
+                  row.original.isActive === true ? "destructive" : "default"
+                }
+                onClick={() => setOpenChange(true)}
+              >
                 {row.original.isActive === true ? (
                   <>
                     <XCircle />
@@ -199,8 +231,6 @@ export const columns: ColumnDef<Product>[] = [
                   </>
                 )}
               </DropdownMenuItem>
-
-
             </DropdownMenuContent>
           </DropdownMenu>
 
@@ -211,7 +241,7 @@ export const columns: ColumnDef<Product>[] = [
             state={row.original.isActive}
           />
         </>
-      )
+      );
     },
   },
-]
+];

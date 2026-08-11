@@ -8,16 +8,27 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { closedCashRegisterFormSchema, type Cash, type ClosedCashRegisterFormValues } from "@/types/cash-register/cash-register.type";
+import {
+  closedCashRegisterFormSchema,
+  type Cash,
+  type ClosedCashRegisterFormValues,
+} from "@/types/cash-register/cash-register.type";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 
 import { closedCashAction } from "@/actions/cash-register/closed-cash.action";
-import { AlertCircle, AlertTriangle, CheckCircle2, CircleDollarSign, Lock, Wallet } from "lucide-react";
+import {
+  AlertCircle,
+  AlertTriangle,
+  CheckCircle2,
+  CircleDollarSign,
+  Lock,
+  Wallet,
+} from "lucide-react";
 import { toast } from "sonner";
 
 const estadoStyles = {
   exacto: {
-    bg: "bg-emerald-50 border-emerald-200",
+    bg: "bg-lime-50 border-lime-200",
     text: "text-emerald-700",
     icon: CheckCircle2,
     label: "Cuadre exacto",
@@ -40,20 +51,20 @@ const estadoStyles = {
 };
 
 interface Props {
-  data: Cash
+  data: Cash;
 }
 
 export const ClosedCashForm = ({ data }: Props) => {
   const params = useParams();
-  const cashRegisterId = params.cashRegisterId!
+  const cashRegisterId = params.cashRegisterId!;
   const navigate = useNavigate();
 
   const form = useForm<ClosedCashRegisterFormValues>({
     resolver: zodResolver(closedCashRegisterFormSchema),
     defaultValues: {
       countedAmount: null,
-      closingNote: ''
-    }
+      closingNote: "",
+    },
   });
 
   const queryClient = useQueryClient();
@@ -63,14 +74,14 @@ export const ClosedCashForm = ({ data }: Props) => {
       toast.error(error.message);
     },
     onSuccess: (msg) => {
-      queryClient.invalidateQueries({ queryKey: ['cash-all'] })
-      queryClient.invalidateQueries({ queryKey: ['cash-register', data._id] })
+      queryClient.invalidateQueries({ queryKey: ["cash-all"] });
+      queryClient.invalidateQueries({ queryKey: ["cash-register", data._id] });
       toast.success(msg);
-      navigate('/cash-register')
-    }
-  })
+      navigate("/cash-register");
+    },
+  });
 
-  const countedAmount = form.watch('countedAmount');
+  const countedAmount = form.watch("countedAmount");
 
   const difference = useMemo(() => {
     if (countedAmount === null) return null;
@@ -84,11 +95,10 @@ export const ClosedCashForm = ({ data }: Props) => {
     return "sobrante" as const;
   }, [countedAmount]);
 
-
   const onSubmit = (formData: ClosedCashRegisterFormValues) => {
-    const params = { cashRegisterId, formData }
+    const params = { cashRegisterId, formData };
     mutate(params);
-  }
+  };
 
   const card = state ? estadoStyles[state] : null;
   const CardIcon = card?.icon;
@@ -137,24 +147,35 @@ export const ClosedCashForm = ({ data }: Props) => {
                 name="countedAmount"
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor={field.name}>Monto Real en Caja *</FieldLabel>
+                    <FieldLabel htmlFor={field.name}>
+                      Monto Real en Caja *
+                    </FieldLabel>
                     <div className="relative">
                       <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-medium text-muted-foreground">
                         Bs
                       </span>
                       <Input
                         id={field.name}
-                        type="number" min="0" step="0.01" autoFocus
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        autoFocus
                         value={field.value ?? ""}
                         onChange={(e) =>
-                          field.onChange(e.target.value === "" ? null : Number(e.target.value))
+                          field.onChange(
+                            e.target.value === ""
+                              ? null
+                              : Number(e.target.value)
+                          )
                         }
                         aria-invalid={fieldState.invalid}
                         placeholder="0.00"
                         className="pl-10 text-2xl h-14 font-bold"
                       />
                     </div>
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
                   </Field>
                 )}
               />
@@ -174,14 +195,18 @@ export const ClosedCashForm = ({ data }: Props) => {
                   <CardIcon className="h-7 w-7" />
                 </div>
                 <div>
-                  <p className={`text-sm font-semibold uppercase tracking-wide ${card.text}`}>
+                  <p
+                    className={`text-sm font-semibold uppercase tracking-wide ${card.text}`}
+                  >
                     {card.label}
                   </p>
                   <p className="text-sm text-muted-foreground">{card.desc}</p>
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-xs text-muted-foreground uppercase">Diferencia</p>
+                <p className="text-xs text-muted-foreground uppercase">
+                  Diferencia
+                </p>
                 <p className={`text-3xl font-bold ${card.text}`}>
                   {difference > 0 ? "+" : ""}Bs {difference.toLocaleString()}
                 </p>
@@ -197,16 +222,20 @@ export const ClosedCashForm = ({ data }: Props) => {
               name="closingNote"
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={field.name}>Nota de cierre (opcional)</FieldLabel>
+                  <FieldLabel htmlFor={field.name}>
+                    Nota de cierre (opcional)
+                  </FieldLabel>
                   <Textarea
                     {...field}
                     id={field.name}
                     aria-invalid={fieldState.invalid}
                     placeholder="Ej. Faltante por vuelto entregado, observaciones del turno..."
                     autoComplete="off"
-                    className='bg-secondary/50'
+                    className="bg-secondary/50"
                   />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
                 </Field>
               )}
             />
@@ -217,12 +246,12 @@ export const ClosedCashForm = ({ data }: Props) => {
           <Button variant="outline" onClick={() => navigate(-1)} type="button">
             Cancelar
           </Button>
-          <Button type="submit" className="gap-2" >
+          <Button type="submit" className="gap-2">
             <Lock className="h-4 w-4" />
             Cerrar Caja
           </Button>
         </div>
       </form>
     </div>
-  )
-}
+  );
+};

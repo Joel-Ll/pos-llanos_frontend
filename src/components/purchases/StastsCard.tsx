@@ -1,18 +1,12 @@
-import {
-  ShoppingCart,
-  FilePen,
-  ClipboardCheck,
-  BookmarkX
-} from "lucide-react";
+import { ShoppingCart, FilePen, ClipboardCheck, BookmarkX } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import type { PurchaseStats } from "@/types/purchases/purchases-type";
 
 interface Props {
-  stats: PurchaseStats
+  stats: PurchaseStats;
 }
 
 export const StatsCard = ({ stats }: Props) => {
-
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
       {/* Todos los registros */}
@@ -27,9 +21,7 @@ export const StatsCard = ({ stats }: Props) => {
               {stats.totalPurchases}
             </p>
 
-            <p className="font-semibold">
-              Total registros
-            </p>
+            <p className="font-semibold">Total registros</p>
 
             <p className="text-sm text-muted-foreground">
               todas las compras registradas
@@ -41,8 +33,8 @@ export const StatsCard = ({ stats }: Props) => {
       {/* Compras realizadas */}
       <Card className="py-0">
         <CardContent className="flex items-center gap-5 p-6">
-          <div className="flex h-20 w-20 items-center justify-center rounded-xl bg-emerald-500/10">
-            <ClipboardCheck className="h-10 w-10 text-emerald-500" />
+          <div className="flex h-20 w-20 items-center justify-center rounded-xl bg-lime-500/10">
+            <ClipboardCheck className="h-10 w-10 text-lime-500" />
           </div>
 
           <div className="space-y-0.5">
@@ -50,9 +42,7 @@ export const StatsCard = ({ stats }: Props) => {
               {stats.totalPurchased}
             </p>
 
-            <p className="font-semibold">
-              Compras realizadas
-            </p>
+            <p className="font-semibold">Compras realizadas</p>
 
             <p className="text-sm text-muted-foreground">
               todas las compras realizadas
@@ -73,9 +63,7 @@ export const StatsCard = ({ stats }: Props) => {
               {stats.totalCancelled}
             </p>
 
-            <p className="font-semibold">
-              Compras anuladas
-            </p>
+            <p className="font-semibold">Compras anuladas</p>
 
             <p className="text-sm text-muted-foreground">
               todas las compras anuladas
@@ -93,12 +81,11 @@ export const StatsCard = ({ stats }: Props) => {
 
           <div className="space-y-0.5">
             <p className="text-3xl font-bold leading-none">
-              <span className="text-2xl">Bs. </span> {stats.totalAmount.toLocaleString()}
+              <span className="text-2xl">Bs. </span>{" "}
+              {stats.totalAmount.toLocaleString()}
             </p>
 
-            <p className="font-semibold">
-              Total comprado
-            </p>
+            <p className="font-semibold">Total comprado</p>
 
             <p className="text-sm text-muted-foreground">
               Costo estimado de las compras

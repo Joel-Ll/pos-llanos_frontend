@@ -108,11 +108,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <div>
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                  <Cog className="size-4" />
+                <div className="flex aspect-square bg-sidebar-primary size-8 items-center justify-center rounded-lg text-sidebar-primary-foreground">
+                  <img src="/logo3.png" alt="" className="rounded-" />
+                  {/* <Cog className="size-4" /> */}
                 </div>
                 <div className="flex flex-col gap-0.5 leading-none">
-                  <span className="font-medium uppercase">Aut. Llanos</span>
+                  <span className="font-medium uppercase">Taller. Llanos</span>
                 </div>
               </div>
             </SidebarMenuButton>
