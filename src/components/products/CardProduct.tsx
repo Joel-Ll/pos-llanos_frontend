@@ -1,22 +1,20 @@
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, SetStateAction } from "react";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogTitle,
-} from "@/components/ui/dialog"
-import type { Product } from '@/types/products/products.type'
-import { Badge } from '@/components/ui/badge'
-import { getThumbnailUrl } from '@/utils';
+} from "@/components/ui/dialog";
+import type { Product } from "@/types/products/products.type";
+import { Badge } from "@/components/ui/badge";
 
 interface Props {
-  product: Product | undefined,
+  product: Product | undefined;
   openView: boolean;
-  setOpenView: Dispatch<SetStateAction<boolean>>
+  setOpenView: Dispatch<SetStateAction<boolean>>;
 }
 
 export default function CardProduct({ product, openView, setOpenView }: Props) {
-
   return (
     <Dialog
       open={openView}
@@ -24,7 +22,6 @@ export default function CardProduct({ product, openView, setOpenView }: Props) {
         setOpenView(isOpen);
       }}
     >
-
       {product && (
         <DialogContent className="max-w-3xl p-0 overflow-hidden border-0">
           <DialogTitle>
@@ -52,7 +49,7 @@ export default function CardProduct({ product, openView, setOpenView }: Props) {
               <div className="absolute top-4 left-4">
                 <Badge
                   variant="outline"
-                  className='bg-card text-card-foreground border-border backdrop-blur-sm'
+                  className="bg-card text-card-foreground border-border backdrop-blur-sm"
                 >
                   {product.category.name}
                 </Badge>
@@ -65,7 +62,10 @@ export default function CardProduct({ product, openView, setOpenView }: Props) {
                       {product.description}
                     </h2>
                     <p className="text-sm text-white/90 drop-shadow-md">
-                      Código: <span className="font-mono font-semibold">{product.internalCode}</span>
+                      Código:{" "}
+                      <span className="font-mono font-semibold">
+                        {product.internalCode}
+                      </span>
                     </p>
                   </div>
 
@@ -82,7 +82,6 @@ export default function CardProduct({ product, openView, setOpenView }: Props) {
                 </div>
               </div>
             </div>
-
           </DialogTitle>
 
           <DialogDescription></DialogDescription>
@@ -90,22 +89,31 @@ export default function CardProduct({ product, openView, setOpenView }: Props) {
           <div className="p-6 space-y-4">
             <div className="flex justify-between">
               <div className="space-y-1">
-                <p className="text-xs text-muted-foreground uppercase tracking-wider">Marca</p>
-                <p className="text-base font-semibold text-foreground">{product.brand}</p>
+                <p className="text-xs text-muted-foreground uppercase tracking-wider">
+                  Marca
+                </p>
+                <p className="text-base font-semibold text-foreground">
+                  {product.brand}
+                </p>
               </div>
               <div className="space-y-1">
-                <p className="text-xs text-muted-foreground uppercase tracking-wider">Proveedor</p>
-                <p className="text-base font-semibold text-foreground">{product.supplier.enterprise}</p>
+                <p className="text-xs text-muted-foreground uppercase tracking-wider">
+                  Proveedor
+                </p>
+                <p className="text-base font-semibold text-foreground">
+                  {product.supplier.enterprise}
+                </p>
               </div>
               <div className="space-y-1">
                 <p className="text-xs text-muted-foreground uppercase">Stock</p>
-                <p className="text-base font-semibold text-foreground">{product.currentStock} {product.unidadMedida}</p>
+                <p className="text-base font-semibold text-foreground">
+                  {product.currentStock} {product.unidadMedida}
+                </p>
               </div>
             </div>
           </div>
         </DialogContent>
       )}
     </Dialog>
-  )
+  );
 }
-
