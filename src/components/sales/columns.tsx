@@ -1,7 +1,6 @@
-import { useState } from "react";
 import { useNavigate } from "react-router";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Calendar, Eye, MoreHorizontal, Printer, X } from "lucide-react";
+import { Calendar, Eye, MoreHorizontal } from "lucide-react";
 
 import {
   DropdownMenu,
@@ -13,7 +12,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import type { SaleComun } from "@/types/sales/sales.type";
 import { formatDate } from "date-fns";
-import { CancelSale } from "./CancelSale";
 import { formatCurrency } from "@/utils";
 
 export const columns: ColumnDef<SaleComun>[] = [
@@ -136,7 +134,6 @@ export const columns: ColumnDef<SaleComun>[] = [
     cell: ({ row }) => {
       const navigate = useNavigate();
       const saleId = row.original._id;
-      const [openCancel, setOpenCancel] = useState(false);
 
       return (
         <div className="text-right">
@@ -154,22 +151,8 @@ export const columns: ColumnDef<SaleComun>[] = [
                 <Eye />
                 Ver
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Printer />
-                Imprimir
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setOpenCancel(true)}>
-                <X />
-                Cancelar
-              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-
-          <CancelSale
-            openCancel={openCancel}
-            setOpenCancel={setOpenCancel}
-            saleId={saleId}
-          />
         </div>
       );
     },

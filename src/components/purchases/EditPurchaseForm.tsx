@@ -1,41 +1,72 @@
-import { useState } from 'react';
-import { useNavigate, useParams } from 'react-router';
-import { Controller, useFieldArray, useForm } from 'react-hook-form';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useSelectSupplier } from '@/hooks/useSupplier';
+import { useState } from "react";
+import { useNavigate, useParams } from "react-router";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useSelectSupplier } from "@/hooks/useSupplier";
 
-
-import { CalendarIcon, Minus, Package, ShoppingCart, Trash2, TrendingDown, TrendingUp } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import {
+  CalendarIcon,
+  Minus,
+  Package,
+  ShoppingCart,
+  Trash2,
+  TrendingDown,
+  TrendingUp,
+} from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { Field, FieldError, FieldLabel } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { SearchableSelect } from '@/components/ui/searchable-select';
-import { TableHeader, TableRow, TableHead, TableBody, TableCell, TableFooter, Table } from '@/components/ui/table';
+} from "@/components/ui/select";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { SearchableSelect } from "@/components/ui/searchable-select";
+import {
+  TableHeader,
+  TableRow,
+  TableHead,
+  TableBody,
+  TableCell,
+  TableFooter,
+  Table,
+} from "@/components/ui/table";
 
-import { purchaseFormSchema, type ProductCatalog, type ProductItem, type Purchase, type PurchaseFormValues } from '@/types/purchases/purchases-type';
-import type { SupplierSelect } from '@/types/suppliers/suppliers.type';
-import { cn } from '@/lib/utils';
+import {
+  purchaseFormSchema,
+  type ProductCatalog,
+  type ProductItem,
+  type Purchase,
+  type PurchaseFormValues,
+} from "@/types/purchases/purchases-type";
+import type { SupplierSelect } from "@/types/suppliers/suppliers.type";
+import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import type z from 'zod';
-import { getProductsItemAction } from '@/actions/purchases/get-products-item.action';
-import { removeItems } from '@/actions/purchases/remove-items.action';
-import { editPurchaseAction } from '@/actions/purchases/edit-purchase.action';
-import { formatDate } from '@/utils';
+import type z from "zod";
+import { getProductsItemAction } from "@/actions/purchases/get-products-item.action";
+import { removeItems } from "@/actions/purchases/remove-items.action";
+import { editPurchaseAction } from "@/actions/purchases/edit-purchase.action";
+import { formatCurrency, formatDate } from "@/utils";
+import { Spinner } from "../ui/spinner";
 
 interface Props {
-  data: Purchase
+  data: Purchase;
 }
 
 export const EditPurchaseForm = ({ data }: Props) => {
@@ -44,14 +75,15 @@ export const EditPurchaseForm = ({ data }: Props) => {
   const navigate = useNavigate();
   const { data: suppliersSelect } = useSelectSupplier();
   const [searchOpen, setSearchOpen] = useState(false);
-  const suppliersActive = suppliersSelect?.filter(supp => supp.isActive) || [];
+  const suppliersActive =
+    suppliersSelect?.filter((supp) => supp.isActive) || [];
 
   const transformedData = {
     supplier: data.supplier._id,
     invoiceNumber: data.invoiceNumber,
     date: new Date(data.date),
     detail: data.detail,
-    items: data.products.map(product => ({
+    items: data.products.map((product) => ({
       _id: product.productId,
       image: product.image,
       internalCode: product.internalCode,
@@ -61,11 +93,11 @@ export const EditPurchaseForm = ({ data }: Props) => {
       purchasePrice: product.purchasePrice,
       salePrice: product.salePrice,
       quantity: product.quantity,
-    }))
+    })),
   };
 
   const { data: catalogProducts } = useQuery({
-    queryKey: ['product-items'],
+    queryKey: ["product-items"],
     queryFn: getProductsItemAction,
     retry: false,
   });
@@ -74,17 +106,17 @@ export const EditPurchaseForm = ({ data }: Props) => {
     mutationFn: removeItems,
 
     onError: (error: TypeError) => {
-      toast.error(error.message || 'Error al eliminar');
+      toast.error(error.message || "Error al eliminar");
     },
 
     onSuccess: (_, variables) => {
       remove(variables.index);
-    }
+    },
   });
 
   const form = useForm<PurchaseFormValues>({
     resolver: zodResolver(purchaseFormSchema),
-    defaultValues: transformedData
+    defaultValues: transformedData,
   });
 
   const items = form.watch("items");
@@ -109,7 +141,7 @@ export const EditPurchaseForm = ({ data }: Props) => {
     removeItem({
       purchaseId: purchaseId,
       productId,
-      index
+      index,
     });
   };
 
@@ -128,24 +160,23 @@ export const EditPurchaseForm = ({ data }: Props) => {
     if (!previous || previous === 0) return null;
     const diff = ((current - previous) / previous) * 100;
     if (Math.abs(diff) < 0.01) return { type: "equal" as const, diff: 0 };
-    return { type: diff > 0 ? "up" as const : "down" as const, diff };
+    return { type: diff > 0 ? ("up" as const) : ("down" as const), diff };
   };
 
   const queryClient = useQueryClient();
-  const { mutate } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: editPurchaseAction,
     onError: (error: TypeError) => {
       toast.error(error.message);
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['purchases'] });
-      queryClient.invalidateQueries({ queryKey: ['product-items'] });
-      queryClient.invalidateQueries({ queryKey: ['purchase', purchaseId], });
+      queryClient.invalidateQueries({ queryKey: ["purchases"] });
+      queryClient.invalidateQueries({ queryKey: ["product-items"] });
+      queryClient.invalidateQueries({ queryKey: ["purchase", purchaseId] });
       navigate(-1);
       toast.success(data);
-    }
-  })
-
+    },
+  });
 
   function onSubmit(data: z.infer<typeof purchaseFormSchema>) {
     mutate({ purchaseId, formData: data });
@@ -154,21 +185,19 @@ export const EditPurchaseForm = ({ data }: Props) => {
   const handleClose = () => {
     form.reset();
     navigate(-1);
-  }
+  };
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
+    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
       <Card>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Proveedor */}
             <Controller
-              name='supplier'
+              name="supplier"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field
-                  data-invalid={fieldState.invalid}
-                >
+                <Field data-invalid={fieldState.invalid}>
                   <FieldLabel>Proveedor *</FieldLabel>
                   <Select
                     name={field.name}
@@ -186,7 +215,7 @@ export const EditPurchaseForm = ({ data }: Props) => {
                       {suppliersActive && suppliersActive.length > 0 ? (
                         <>
                           {suppliersActive.map((item: SupplierSelect) => (
-                            <SelectItem key={item._id} value={item._id} >
+                            <SelectItem key={item._id} value={item._id}>
                               {item.enterprise}
                             </SelectItem>
                           ))}
@@ -200,7 +229,9 @@ export const EditPurchaseForm = ({ data }: Props) => {
                       )}
                     </SelectContent>
                   </Select>
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
                 </Field>
               )}
             />
@@ -211,7 +242,9 @@ export const EditPurchaseForm = ({ data }: Props) => {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={field.name}>Nro. Factura / Lote *</FieldLabel>
+                  <FieldLabel htmlFor={field.name}>
+                    Nro. Factura / Lote *
+                  </FieldLabel>
                   <Input
                     {...field}
                     id={field.name}
@@ -219,7 +252,9 @@ export const EditPurchaseForm = ({ data }: Props) => {
                     placeholder="Ej: FAC-00123"
                     autoComplete="off"
                   />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
                 </Field>
               )}
             />
@@ -242,7 +277,11 @@ export const EditPurchaseForm = ({ data }: Props) => {
                         )}
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {field.value ? formatDate(new Date(field.value)) : <span>Seleccione una fecha</span>}
+                        {field.value ? (
+                          formatDate(new Date(field.value))
+                        ) : (
+                          <span>Seleccione una fecha</span>
+                        )}
                       </Button>
                     </PopoverTrigger>
 
@@ -255,7 +294,9 @@ export const EditPurchaseForm = ({ data }: Props) => {
                     </PopoverContent>
                   </Popover>
 
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
                 </Field>
               )}
             />
@@ -266,7 +307,9 @@ export const EditPurchaseForm = ({ data }: Props) => {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={field.name}>Detalle / Observación</FieldLabel>
+                  <FieldLabel htmlFor={field.name}>
+                    Detalle / Observación
+                  </FieldLabel>
                   <Input
                     {...field}
                     id={field.name}
@@ -274,7 +317,9 @@ export const EditPurchaseForm = ({ data }: Props) => {
                     placeholder="Nota adicional..."
                     autoComplete="off"
                   />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
                 </Field>
               )}
             />
@@ -282,8 +327,7 @@ export const EditPurchaseForm = ({ data }: Props) => {
         </CardContent>
       </Card>
 
-
-      <Card className='mt-5'>
+      <Card className="mt-5">
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2 text-xl">
@@ -292,20 +336,21 @@ export const EditPurchaseForm = ({ data }: Props) => {
             </CardTitle>
 
             <SearchableSelect
-              label='Agregar Producto'
+              label="Agregar Producto"
               searchOpen={searchOpen}
               setSearchOpen={setSearchOpen}
               catalogProducts={catalogProducts}
               handleAddProduct={handleAddProduct}
             />
-
           </div>
         </CardHeader>
         <CardContent>
           {items.length === 0 ? (
             <div className="text-center py-16 border-2 border-dashed rounded-lg">
               <ShoppingCart className="h-12 w-12 mx-auto text-muted-foreground/40 mb-3" />
-              <p className="text-muted-foreground font-medium">No hay productos agregados</p>
+              <p className="text-muted-foreground font-medium">
+                No hay productos agregados
+              </p>
               <p className="text-sm text-muted-foreground/60 mt-1">
                 Use el botón "Agregar Producto" para buscar y seleccionar
               </p>
@@ -318,7 +363,9 @@ export const EditPurchaseForm = ({ data }: Props) => {
                     <TableHead className="w-12">#</TableHead>
                     <TableHead>Producto</TableHead>
                     <TableHead className="w-28 text-center">Cantidad</TableHead>
-                    <TableHead className="w-36 text-center">P. Compra</TableHead>
+                    <TableHead className="w-36 text-center">
+                      P. Compra
+                    </TableHead>
                     <TableHead className="w-36 text-center">P. Venta</TableHead>
                     <TableHead className="w-32 text-right">Subtotal</TableHead>
                     <TableHead className="w-16"></TableHead>
@@ -335,7 +382,7 @@ export const EditPurchaseForm = ({ data }: Props) => {
                           {item.image ? (
                             <img
                               src={item.image}
-                              alt='imagen producto'
+                              alt="imagen producto"
                               className="h-15 w-15 rounded object-cover shrink-0"
                               loading="lazy"
                             />
@@ -354,7 +401,10 @@ export const EditPurchaseForm = ({ data }: Props) => {
                             </p>
 
                             <p className="text-sm text-muted-foreground truncate">
-                              #{item.internalCode} - {item.catalogCode === '' ? 's/n' : item.catalogCode}
+                              #{item.internalCode} -{" "}
+                              {item.catalogCode === ""
+                                ? "s/n"
+                                : item.catalogCode}
                             </p>
                           </div>
                         </div>
@@ -365,7 +415,11 @@ export const EditPurchaseForm = ({ data }: Props) => {
                           min={1}
                           value={item.quantity}
                           onChange={(e) =>
-                            handleUpdateItem(index, "quantity", Number(e.target.value))
+                            handleUpdateItem(
+                              index,
+                              "quantity",
+                              Number(e.target.value)
+                            )
                           }
                           className="text-center h-9"
                         />
@@ -380,41 +434,62 @@ export const EditPurchaseForm = ({ data }: Props) => {
                                 step={0.01}
                                 value={item.purchasePrice || 0}
                                 onChange={(e) =>
-                                  handleUpdateItem(index, "purchasePrice", Number(e.target.value))
+                                  handleUpdateItem(
+                                    index,
+                                    "purchasePrice",
+                                    Number(e.target.value)
+                                  )
                                 }
                                 className="text-center h-9"
                               />
                             </TooltipTrigger>
-                            {item.purchasePrice != null && (() => {
-                              const originalProduct = catalogProducts?.find(p => p._id === item._id);
+                            {item.purchasePrice != null &&
+                              (() => {
+                                const originalProduct = catalogProducts?.find(
+                                  (p) => p._id === item._id
+                                );
 
-                              if (!originalProduct || originalProduct.purchasePrice === undefined) return null;
+                                if (
+                                  !originalProduct ||
+                                  originalProduct.purchasePrice === undefined
+                                )
+                                  return null;
 
-                              const info = getPriceDiff(item.purchasePrice, originalProduct.purchasePrice);
+                                const info = getPriceDiff(
+                                  item.purchasePrice,
+                                  originalProduct.purchasePrice
+                                );
 
-                              return (
-                                <TooltipContent>
-                                  <div className="flex items-center gap-1.5 text-xs">
-                                    <span>Anterior: Bs. {originalProduct.purchasePrice.toFixed(2)}</span>
-                                    {info && info.type === "up" && (
-                                      <span className="text-emerald-400 flex items-center gap-0.5">
-                                        <TrendingUp className="h-3 w-3" /> +{info.diff.toFixed(1)}%
+                                return (
+                                  <TooltipContent>
+                                    <div className="flex items-center gap-1.5 text-xs">
+                                      <span>
+                                        Anterior: Bs.{" "}
+                                        {formatCurrency(
+                                          originalProduct.purchasePrice
+                                        )}
                                       </span>
-                                    )}
-                                    {info && info.type === "down" && (
-                                      <span className="text-red-400 flex items-center gap-0.5">
-                                        <TrendingDown className="h-3 w-3" /> {info.diff.toFixed(1)}%
-                                      </span>
-                                    )}
-                                    {info && info.type === "equal" && (
-                                      <span className="flex items-center gap-0.5">
-                                        <Minus className="h-3 w-3" /> 0%
-                                      </span>
-                                    )}
-                                  </div>
-                                </TooltipContent>
-                              );
-                            })()}
+                                      {info && info.type === "up" && (
+                                        <span className="text-emerald-400 flex items-center gap-0.5">
+                                          <TrendingUp className="h-3 w-3" /> +
+                                          {info.diff.toFixed(1)}%
+                                        </span>
+                                      )}
+                                      {info && info.type === "down" && (
+                                        <span className="text-red-400 flex items-center gap-0.5">
+                                          <TrendingDown className="h-3 w-3" />{" "}
+                                          {info.diff.toFixed(1)}%
+                                        </span>
+                                      )}
+                                      {info && info.type === "equal" && (
+                                        <span className="flex items-center gap-0.5">
+                                          <Minus className="h-3 w-3" /> 0%
+                                        </span>
+                                      )}
+                                    </div>
+                                  </TooltipContent>
+                                );
+                              })()}
                           </Tooltip>
                         </TooltipProvider>
                       </TableCell>
@@ -428,48 +503,69 @@ export const EditPurchaseForm = ({ data }: Props) => {
                                 step={0.01}
                                 value={item.salePrice}
                                 onChange={(e) =>
-                                  handleUpdateItem(index, "salePrice", Number(e.target.value))
+                                  handleUpdateItem(
+                                    index,
+                                    "salePrice",
+                                    Number(e.target.value)
+                                  )
                                 }
                                 className="text-center h-9"
                               />
                             </TooltipTrigger>
 
-                            {item.salePrice != null && (() => {
-                              // Buscar el producto original en el catálogo usando el _id del item
-                              const originalProduct = catalogProducts?.find(p => p._id === item._id);
+                            {item.salePrice != null &&
+                              (() => {
+                                // Buscar el producto original en el catálogo usando el _id del item
+                                const originalProduct = catalogProducts?.find(
+                                  (p) => p._id === item._id
+                                );
 
-                              if (!originalProduct || originalProduct.salePrice === undefined) return null;
+                                if (
+                                  !originalProduct ||
+                                  originalProduct.salePrice === undefined
+                                )
+                                  return null;
 
-                              const info = getPriceDiff(item.salePrice, originalProduct.salePrice);
+                                const info = getPriceDiff(
+                                  item.salePrice,
+                                  originalProduct.salePrice
+                                );
 
-                              return (
-                                <TooltipContent>
-                                  <div className="flex items-center gap-1.5 text-xs">
-                                    <span>Anterior: Bs. {originalProduct.salePrice.toFixed(2)}</span>
-                                    {info && info.type === "up" && (
-                                      <span className="text-emerald-400 flex items-center gap-0.5">
-                                        <TrendingUp className="h-3 w-3" /> +{info.diff.toFixed(1)}%
+                                return (
+                                  <TooltipContent>
+                                    <div className="flex items-center gap-1.5 text-xs">
+                                      <span>
+                                        Anterior: Bs.{" "}
+                                        {formatCurrency(
+                                          originalProduct.salePrice
+                                        )}
                                       </span>
-                                    )}
-                                    {info && info.type === "down" && (
-                                      <span className="text-red-400 flex items-center gap-0.5">
-                                        <TrendingDown className="h-3 w-3" /> {info.diff.toFixed(1)}%
-                                      </span>
-                                    )}
-                                    {info && info.type === "equal" && (
-                                      <span className="flex items-center gap-0.5">
-                                        <Minus className="h-3 w-3" /> 0%
-                                      </span>
-                                    )}
-                                  </div>
-                                </TooltipContent>
-                              );
-                            })()}
+                                      {info && info.type === "up" && (
+                                        <span className="text-emerald-400 flex items-center gap-0.5">
+                                          <TrendingUp className="h-3 w-3" /> +
+                                          {info.diff.toFixed(1)}%
+                                        </span>
+                                      )}
+                                      {info && info.type === "down" && (
+                                        <span className="text-red-400 flex items-center gap-0.5">
+                                          <TrendingDown className="h-3 w-3" />{" "}
+                                          {info.diff.toFixed(1)}%
+                                        </span>
+                                      )}
+                                      {info && info.type === "equal" && (
+                                        <span className="flex items-center gap-0.5">
+                                          <Minus className="h-3 w-3" /> 0%
+                                        </span>
+                                      )}
+                                    </div>
+                                  </TooltipContent>
+                                );
+                              })()}
                           </Tooltip>
                         </TooltipProvider>
                       </TableCell>
                       <TableCell className="text-right font-semibold tabular-nums">
-                        Bs. {getSubtotal(item).toLocaleString()}
+                        Bs. {formatCurrency(getSubtotal(item))}
                       </TableCell>
                       <TableCell>
                         <Button
@@ -487,11 +583,14 @@ export const EditPurchaseForm = ({ data }: Props) => {
                 </TableBody>
                 <TableFooter>
                   <TableRow>
-                    <TableCell colSpan={5} className="text-right font-semibold text-base">
+                    <TableCell
+                      colSpan={5}
+                      className="text-right font-semibold text-base"
+                    >
                       Total:
                     </TableCell>
                     <TableCell className="text-right font-bold text-lg text-primary tabular-nums">
-                      Bs. {getTotal(items).toLocaleString()}
+                      Bs. {formatCurrency(getTotal(items))}
                     </TableCell>
                     <TableCell />
                   </TableRow>
@@ -503,15 +602,23 @@ export const EditPurchaseForm = ({ data }: Props) => {
       </Card>
 
       <div className="flex gap-4 justify-end mt-5">
-        <Field orientation="horizontal">
-          <Button type="button" variant="outline" onClick={handleClose}>
-            Cancelar
-          </Button>
-          <Button type="submit" disabled={!items.length}>
-            Aceptar
-          </Button>
-        </Field>
+        <Button type="button" variant="outline" onClick={handleClose}>
+          Cancelar
+        </Button>
+        <Button
+          type="submit"
+          disabled={!form.getValues("items").length || isPending}
+        >
+          {isPending ? (
+            <>
+              <Spinner data-icon="inline-start" />
+              Cargando...
+            </>
+          ) : (
+            "Aceptar"
+          )}
+        </Button>
       </div>
     </form>
-  )
-}
+  );
+};

@@ -1,42 +1,44 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router'
-import type { ColumnDef } from "@tanstack/react-table"
+import { useState } from "react";
+import { useNavigate } from "react-router";
+import type { ColumnDef } from "@tanstack/react-table";
 
-import { CheckCircle, Edit2, EyeIcon, MoreHorizontal, Phone, XCircle } from 'lucide-react'
+import {
+  CheckCircle,
+  Edit2,
+  EyeIcon,
+  MoreHorizontal,
+  Phone,
+  XCircle,
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import type { SupplierDataStats } from '@/types/suppliers/suppliers.type'
-import { formatDate } from '@/utils'
-import { differenceInCalendarDays } from 'date-fns'
-import { DetailSupplier } from './DetailSupplier'
-import { ChangeState } from './ChangeState'
-
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import type { SupplierDataStats } from "@/types/suppliers/suppliers.type";
+import { formatCurrency, formatDate } from "@/utils";
+import { differenceInCalendarDays } from "date-fns";
+import { DetailSupplier } from "./DetailSupplier";
+import { ChangeState } from "./ChangeState";
 
 export const columns: ColumnDef<SupplierDataStats>[] = [
   // Empresa
   {
     accessorKey: "enterprise",
-    header: 'Empresa',
+    header: "Empresa",
     cell: ({ row }) => {
-      const enterprise = row.original.enterprise
+      const enterprise = row.original.enterprise;
 
-      return (
-        <p className="font-medium block">
-          {enterprise}
-        </p>
-      )
-    }
+      return <p className="font-medium block">{enterprise}</p>;
+    },
   },
   // Contacto
   {
     accessorKey: "contact",
-    header: 'Contácto',
+    header: "Contácto",
     cell: ({ row }) => {
       return (
         <div className="text-sm space-y-0.5">
@@ -45,67 +47,71 @@ export const columns: ColumnDef<SupplierDataStats>[] = [
             <Phone className="h-3 w-3" /> {row.original.contact.phone}
           </div>
         </div>
-      )
-    }
+      );
+    },
   },
   {
     accessorKey: "totalPurchases",
-    header: () => (
-      <div className='text-center'>Compras</div>
-    ),
+    header: () => <div className="text-center">Compras</div>,
     cell: ({ row }) => {
       return (
         <div className="flex flex-col items-center">
-          <p className='font-semibold'>{row.original.totalPurchases}</p>
-          <p className='text-muted-foreground text-xs'>compras</p>
+          <p className="font-semibold">{row.original.totalPurchases}</p>
+          <p className="text-muted-foreground text-xs">compras</p>
         </div>
-      )
-    }
+      );
+    },
   },
   {
     accessorKey: "lastPurchase",
-    header: () => (
-      <div className='text-center'>Última compra</div>
-    ),
+    header: () => <div className="text-center">Última compra</div>,
     cell: ({ row }) => {
       const lastPurchase = row.original.lastPurchase;
       return (
         <>
           {lastPurchase ? (
             <div className="flex flex-col items-center">
-              <p className='font-semibold'>{formatDate(new Date(lastPurchase))}</p>
-              <p className='text-muted-foreground text-xs'>Hace {differenceInCalendarDays(lastPurchase, new Date())} días</p>
+              <p className="font-semibold">
+                {formatDate(new Date(lastPurchase))}
+              </p>
+              <p className="text-muted-foreground text-xs">
+                Hace {differenceInCalendarDays(lastPurchase, new Date())} días
+              </p>
             </div>
           ) : (
-            <p className='text-sm text-muted-foreground text-center'>Sin registro...</p>
+            <p className="text-sm text-muted-foreground text-center">
+              Sin registro...
+            </p>
           )}
         </>
-      )
-    }
+      );
+    },
   },
   {
     accessorKey: "totalPurchased",
-    header: () => <div className='text-right'>Total comprado</div>,
+    header: () => <div className="text-right">Total comprado</div>,
 
     cell: ({ row }) => {
       return (
         <p className="font-semibold  text-right">
-          Bs. <span className='text-muted-foreground font-normal'>{row.original.totalPurchased.toLocaleString()}</span>
+          Bs.{" "}
+          <span className="text-muted-foreground font-normal">
+            {formatCurrency(row.original.totalPurchased)}
+          </span>
         </p>
-      )
-    }
+      );
+    },
   },
   // Estado
   {
     accessorKey: "isActive",
-    header: 'Estado',
+    header: "Estado",
     cell: ({ row }) => {
-      const isActive: boolean = row.getValue('isActive');
+      const isActive: boolean = row.getValue("isActive");
 
       return (
         <>
           {isActive ? (
-
             <Badge className="bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300">
               Activo
             </Badge>
@@ -116,14 +122,14 @@ export const columns: ColumnDef<SupplierDataStats>[] = [
           )}
         </>
       );
-    }
+    },
   },
   // Acciones
   {
     id: "actions",
     cell: ({ row }) => {
       const navigate = useNavigate();
-      const supplierId = row.original._id
+      const supplierId = row.original._id;
       const [openView, setOpenView] = useState(false);
       const [openChange, setOpenChange] = useState(false);
 
@@ -137,19 +143,28 @@ export const columns: ColumnDef<SupplierDataStats>[] = [
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => {
-                setOpenView(true)
-              }} >
+              <DropdownMenuItem
+                onClick={() => {
+                  setOpenView(true);
+                }}
+              >
                 <EyeIcon />
                 Ver
               </DropdownMenuItem>
 
-              <DropdownMenuItem onClick={() => navigate(`/suppliers/edit/${supplierId}`)} >
+              <DropdownMenuItem
+                onClick={() => navigate(`/suppliers/edit/${supplierId}`)}
+              >
                 <Edit2 />
                 Editar
               </DropdownMenuItem>
 
-              <DropdownMenuItem variant={row.original.isActive === true ? 'destructive' : 'default'} onClick={() => setOpenChange(true)}>
+              <DropdownMenuItem
+                variant={
+                  row.original.isActive === true ? "destructive" : "default"
+                }
+                onClick={() => setOpenChange(true)}
+              >
                 {row.original.isActive === true ? (
                   <>
                     <XCircle />
@@ -178,7 +193,7 @@ export const columns: ColumnDef<SupplierDataStats>[] = [
             setOpenView={setOpenView}
           />
         </>
-      )
+      );
     },
   },
-]
+];

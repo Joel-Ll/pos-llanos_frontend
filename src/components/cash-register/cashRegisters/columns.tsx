@@ -1,33 +1,36 @@
-import { useNavigate } from 'react-router'
-import type { ColumnDef } from "@tanstack/react-table"
-import { Eye, MoreHorizontal, User } from 'lucide-react'
+import { useNavigate } from "react-router";
+import type { ColumnDef } from "@tanstack/react-table";
+import { Eye, MoreHorizontal, User } from "lucide-react";
 
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import type { CashRegisterData } from '@/types/cash-register/cash-register.type'
-import { cn } from '@/lib/utils'
-import { formatDate } from '@/utils'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import type { CashRegisterData } from "@/types/cash-register/cash-register.type";
+import { cn } from "@/lib/utils";
+import { formatCurrency, formatDate } from "@/utils";
 
 export const columns: ColumnDef<CashRegisterData>[] = [
   {
-    accessorKey: 'code',
-    header: 'Caja',
+    accessorKey: "code",
+    header: "Caja",
     cell: ({ row }) => (
-      <div className="font-medium text-sm">
-        {row.original.code}
-      </div>
-    )
+      <div className="font-medium text-sm">{row.original.code}</div>
+    ),
   },
   {
-    accessorKey: 'user',
-    header: 'Responsable',
+    accessorKey: "user",
+    header: "Responsable",
     cell: ({ row }) => (
       <div className="flex items-center gap-1.5 text-sm">
         <User className="h-3.5 w-3.5 text-muted-foreground" />
         {row.original.user}
       </div>
-    )
+    ),
   },
   {
     accessorKey: "openedAt",
@@ -43,35 +46,29 @@ export const columns: ColumnDef<CashRegisterData>[] = [
         rowDate.getDate() === value.getDate()
       );
     },
-    cell: ({ row }) => (
-      <div>{formatDate(new Date(row.original.openedAt))}</div>
-    )
+    cell: ({ row }) => <div>{formatDate(new Date(row.original.openedAt))}</div>,
   },
   {
-    accessorKey: 'totalMovements',
+    accessorKey: "totalMovements",
     header: "Movimientos",
     cell: ({ row }) => (
-      <div className='text-center'>
-        <Badge variant={'secondary'}>{row.original.totalMovements}</Badge>
+      <div className="text-center">
+        <Badge variant={"secondary"}>{row.original.totalMovements}</Badge>
       </div>
-    )
+    ),
   },
   {
-    accessorKey: 'expectedAmount',
-    header: () => (
-      <div className="text-right">Esperado</div>
-    ),
+    accessorKey: "expectedAmount",
+    header: () => <div className="text-right">Esperado</div>,
     cell: ({ row }) => (
       <div className="text-right font-medium">
-        Bs. {row.original.expectedAmount.toLocaleString()}
+        Bs. {formatCurrency(row.original.expectedAmount)}
       </div>
     ),
   },
   {
-    accessorKey: 'countedAmount',
-    header: () => (
-      <div className="text-right">Contado</div>
-    ),
+    accessorKey: "countedAmount",
+    header: () => <div className="text-right">Contado</div>,
     cell: ({ row }) => {
       const { countedAmount, status } = row.original;
 
@@ -84,29 +81,39 @@ export const columns: ColumnDef<CashRegisterData>[] = [
             status === "open" && "text-muted-foreground"
           )}
         >
-          {countedAmount === 0 ? '---' : (
-            ` Bs. ${countedAmount.toLocaleString()}`
-          )}
+          {countedAmount === 0
+            ? "---"
+            : ` Bs. ${formatCurrency(countedAmount)}`}
         </div>
       );
     },
   },
   {
-    accessorKey: 'status',
-    header: 'Estado',
+    accessorKey: "status",
+    header: "Estado",
     cell: ({ row }) => {
-      const status = row.original.status
+      const status = row.original.status;
       const statusConfig = {
-        open: { label: "Abierta", className: "bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300" },
-        completed: { label: "Completada", className: "bg-sky-50 text-sky-700 dark:bg-sky-950 dark:text-sky-300" },
-        with_difference: { label: "Con diferencia", className: "bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-300" },
+        open: {
+          label: "Abierta",
+          className:
+            "bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300",
+        },
+        completed: {
+          label: "Completada",
+          className: "bg-sky-50 text-sky-700 dark:bg-sky-950 dark:text-sky-300",
+        },
+        with_difference: {
+          label: "Con diferencia",
+          className: "bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-300",
+        },
       };
       return (
         <Badge className={statusConfig[status].className}>
           {statusConfig[status].label}
         </Badge>
-      )
-    }
+      );
+    },
   },
   {
     id: "Acciones",
@@ -115,7 +122,7 @@ export const columns: ColumnDef<CashRegisterData>[] = [
       const cashRegisterId = row.original._id;
 
       return (
-        <div className='text-right'>
+        <div className="text-right">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-8 w-8 p-0">
@@ -124,15 +131,18 @@ export const columns: ColumnDef<CashRegisterData>[] = [
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => navigate(`/cash-register/detail/${cashRegisterId}`)} >
+              <DropdownMenuItem
+                onClick={() =>
+                  navigate(`/cash-register/detail/${cashRegisterId}`)
+                }
+              >
                 <Eye />
                 Ver
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-
         </div>
-      )
+      );
     },
   },
-]
+];

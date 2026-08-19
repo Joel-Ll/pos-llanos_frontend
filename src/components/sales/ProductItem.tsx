@@ -9,22 +9,23 @@ import { toast } from "sonner";
 import type { SalesFormValues } from "@/types/sales/sales.type";
 import type { CatalogProduct } from "@/types/products/products.type";
 import { Package, Plus } from "lucide-react";
+import { formatCurrency } from "@/utils";
 
 interface Props {
-  product: CatalogProduct,
-  items: SalesFormValues['items'];
-  setValue: UseFormSetValue<SalesFormValues>
+  product: CatalogProduct;
+  items: SalesFormValues["items"];
+  setValue: UseFormSetValue<SalesFormValues>;
 }
 
 export default function ProductItem({ product, items, setValue }: Props) {
   const addProduct = (product: CatalogProduct) => {
-    const existing = items.find(i => i.productId === product._id);
+    const existing = items.find((i) => i.productId === product._id);
     if (existing) {
       toast.info("Este producto ya está en la lista");
       return;
     }
     if (product.currentStock === 0) {
-      toast.error('Producto sin stock')
+      toast.error("Producto sin stock");
       return;
     }
 
@@ -38,9 +39,9 @@ export default function ProductItem({ product, items, setValue }: Props) {
       unitPrice: product.salePrice,
       discount: 0,
       subtotal: product.salePrice,
-    }
-    setValue('items', [...items, newItem], { shouldValidate: true });
-    toast.success('Producto agregado')
+    };
+    setValue("items", [...items, newItem], { shouldValidate: true });
+    toast.success("Producto agregado");
   };
 
   return (
@@ -77,7 +78,8 @@ export default function ProductItem({ product, items, setValue }: Props) {
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
               <p className="text-muted-foreground text-xs truncate">
-                #{product.internalCode} • {product.catalogCode ? product.catalogCode : 's/n'}
+                #{product.internalCode} •{" "}
+                {product.catalogCode ? product.catalogCode : "s/n"}
               </p>
             </div>
 
@@ -85,7 +87,9 @@ export default function ProductItem({ product, items, setValue }: Props) {
               {product.description}
             </p>
 
-            <Badge variant={product.currentStock === 0 ? 'destructive' : 'outline'}>
+            <Badge
+              variant={product.currentStock === 0 ? "destructive" : "outline"}
+            >
               Stock: {product.currentStock}
             </Badge>
           </div>
@@ -93,9 +97,8 @@ export default function ProductItem({ product, items, setValue }: Props) {
 
         {/* FOOTER */}
         <div className="flex items-center justify-between pt-4 mt-auto">
-
           <span className="font-bold text-primary">
-            Bs. {product.salePrice.toFixed(2)}
+            Bs. {formatCurrency(product.salePrice)}
           </span>
 
           <Button
@@ -109,5 +112,5 @@ export default function ProductItem({ product, items, setValue }: Props) {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

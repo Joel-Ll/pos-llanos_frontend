@@ -21,10 +21,11 @@ import {
   AlertTriangle,
   CheckCircle2,
   CircleDollarSign,
-  Lock,
   Wallet,
 } from "lucide-react";
 import { toast } from "sonner";
+import { Spinner } from "../ui/spinner";
+import { formatCurrency } from "@/utils";
 
 const estadoStyles = {
   exacto: {
@@ -68,7 +69,7 @@ export const ClosedCashForm = ({ data }: Props) => {
   });
 
   const queryClient = useQueryClient();
-  const { mutate } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: closedCashAction,
     onError: (error: TypeError) => {
       toast.error(error.message);
@@ -115,7 +116,7 @@ export const ClosedCashForm = ({ data }: Props) => {
                 Monto Inicial
               </div>
               <p className="text-3xl font-bold">
-                Bs {data.initialAmount.toLocaleString()}
+                Bs. {formatCurrency(data.initialAmount)}
               </p>
               <p className="text-xs text-muted-foreground mt-2">
                 Apertura del turno
@@ -131,7 +132,7 @@ export const ClosedCashForm = ({ data }: Props) => {
                 Monto Esperado
               </div>
               <p className="text-3xl font-bold text-primary">
-                Bs {data.expectedAmount.toLocaleString()}
+                Bs. {formatCurrency(data.expectedAmount)}
               </p>
               <p className="text-xs text-muted-foreground mt-2">
                 Monto acumulado en efectivo
@@ -208,7 +209,7 @@ export const ClosedCashForm = ({ data }: Props) => {
                   Diferencia
                 </p>
                 <p className={`text-3xl font-bold ${card.text}`}>
-                  {difference > 0 ? "+" : ""}Bs {difference.toLocaleString()}
+                  {difference > 0 ? "+" : ""}Bs. {formatCurrency(difference)}
                 </p>
               </div>
             </CardContent>
@@ -246,9 +247,15 @@ export const ClosedCashForm = ({ data }: Props) => {
           <Button variant="outline" onClick={() => navigate(-1)} type="button">
             Cancelar
           </Button>
-          <Button type="submit" className="gap-2">
-            <Lock className="h-4 w-4" />
-            Cerrar Caja
+          <Button type="submit" disabled={isPending} className="gap-2">
+            {isPending ? (
+              <>
+                <Spinner data-icon="inline-start" />
+                Cargando...
+              </>
+            ) : (
+              "Cerrar Caja"
+            )}
           </Button>
         </div>
       </form>

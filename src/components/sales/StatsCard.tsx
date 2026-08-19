@@ -1,6 +1,7 @@
 import { Wallet, ShoppingCart, TrendingUp, Tags } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import type { SalesStats } from "@/types/sales/sales.type";
+import { formatCurrency } from "@/utils";
 
 interface Props {
   stats: SalesStats;
@@ -39,8 +40,8 @@ export const StatsCard = ({ stats }: Props) => {
 
           <div className="space-y-0.5">
             <p className="text-3xl font-bold leading-none">
-              <span className="text-2xl">Bs. </span>{" "}
-              {stats.totalAmount.toLocaleString()}
+              <span className="text-2xl">Bs </span>{" "}
+              {formatCurrency(stats.totalAmount)}
             </p>
 
             <p className="font-semibold">Total vendido</p>
@@ -52,7 +53,7 @@ export const StatsCard = ({ stats }: Props) => {
         </CardContent>
       </Card>
 
-      {/* Valor de inventario */}
+      {/* Utilidad Generada */}
       <Card className="py-0">
         <CardContent className="flex items-center gap-5 p-6">
           <div className="flex h-20 w-20 items-center justify-center rounded-xl bg-lime-500/10">
@@ -62,7 +63,7 @@ export const StatsCard = ({ stats }: Props) => {
           <div className="space-y-0.5">
             <p className="text-3xl font-bold leading-none">
               <span className="text-2xl">Bs. </span>{" "}
-              {stats.totalProfit.toLocaleString()}
+              {formatCurrency(stats.totalProfit)}
             </p>
 
             <p className="font-semibold">Ganancia</p>
@@ -84,7 +85,7 @@ export const StatsCard = ({ stats }: Props) => {
           <div className="space-y-0.5">
             <p className="text-3xl font-bold leading-none">
               <span className="text-2xl">Bs. </span>{" "}
-              {stats.averageTicket.toLocaleString()}
+              {formatCurrency(stats.averageTicket)}
             </p>
 
             <p className="font-semibold">Ticket promedio</p>

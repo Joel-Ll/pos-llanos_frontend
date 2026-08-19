@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useClients } from "@/hooks/useClients";
 
@@ -76,6 +76,7 @@ import {
   FileDownIcon,
   ListCheck,
   Package,
+  Printer,
   QrCode,
   Search,
   ShoppingCart,
@@ -94,6 +95,7 @@ import ProductSaleItem from "./ProductSaleItem";
 import ServiceItem from "./ServiceItem";
 import SaleSummary from "./SaleSummary";
 import { printTicketAction } from "@/actions/printer-ticked/printTicketAction";
+import { Spinner } from "../ui/spinner";
 
 interface TransactionMethods {
   method: "cash" | "qr";
@@ -320,19 +322,21 @@ export default function SalesForm({ cashRegOpen }: Props) {
     form.reset(defaultValues);
   };
 
-  const { mutate } = useMutation({
+  const queryClient = useQueryClient();
+  const { mutate, isPending: isPendingSale } = useMutation({
     mutationFn: registerSaleAction,
     onError: (error: TypeError) => {
       toast.error(error.message);
     },
     onSuccess: (sale) => {
+      queryClient.invalidateQueries({ queryKey: ["products-catalog"] });
       setSaleData(sale);
       setOpenSuccess(true);
       handleRemoveSale();
     },
   });
 
-  const { mutate: mutatedQuotation } = useMutation({
+  const { mutate: mutatedQuotation, isPending } = useMutation({
     mutationFn: generateQuotationAction,
     onError: (error: TypeError) => {
       toast.error(error.message);
@@ -342,15 +346,16 @@ export default function SalesForm({ cashRegOpen }: Props) {
     },
   });
 
-  const { mutate: mutatedPrinterTicked } = useMutation({
-    mutationFn: printTicketAction,
-    onError: (error: TypeError) => {
-      toast.error(error.message);
-    },
-    onSuccess: () => {
-      setOpenSuccess(false);
-    },
-  });
+  const { mutate: mutatedPrinterTicked, isPending: isPendingPrinter } =
+    useMutation({
+      mutationFn: printTicketAction,
+      onError: (error: TypeError) => {
+        toast.error(error.message);
+      },
+      onSuccess: () => {
+        setOpenSuccess(false);
+      },
+    });
 
   const handleQuotation = () => {
     const data = {
@@ -832,11 +837,21 @@ export default function SalesForm({ cashRegOpen }: Props) {
                   <Button
                     type="button"
                     className="flex-1"
+                    disabled={isPending}
                     size={"lg"}
                     onClick={() => handleQuotation()}
                   >
-                    Cotizar
-                    <FileDownIcon />
+                    {isPending ? (
+                      <>
+                        <Spinner data-icon="inline-start" />
+                        Cargando...
+                      </>
+                    ) : (
+                      <>
+                        Cotizar
+                        <FileDownIcon />
+                      </>
+                    )}
                   </Button>
 
                   <Button
@@ -978,11 +993,24 @@ export default function SalesForm({ cashRegOpen }: Props) {
                 totalAmount={totalAmount}
               >
                 <Button
+                  type="submit"
+                  disabled={
+                    (items.length === 0 && services.length === 0) ||
+                    isPendingSale
+                  }
                   className="w-full"
                   size={"lg"}
-                  disabled={items.length === 0 && services.length === 0}
                 >
-                  <ShoppingCart /> Registrar Venta
+                  {isPending ? (
+                    <>
+                      <Spinner data-icon="inline-start" />
+                      Procesando venta...
+                    </>
+                  ) : (
+                    <>
+                      <ShoppingCart /> Registrar Venta
+                    </>
+                  )}
                 </Button>
               </SaleSummary>
             </Card>
@@ -993,7 +1021,7 @@ export default function SalesForm({ cashRegOpen }: Props) {
       <Dialog open={openSuccess} onOpenChange={setOpenSuccess}>
         <DialogContent className="sm:max-w-sm print:hidden">
           <DialogHeader>
-            <DialogTitle>!Venta Exito</DialogTitle>
+            <DialogTitle>¡Venta Exitosa!</DialogTitle>
             <DialogDescription>Venta procesada exitosamente</DialogDescription>
           </DialogHeader>
           <div className="text-sm space-y-1">
@@ -1010,10 +1038,20 @@ export default function SalesForm({ cashRegOpen }: Props) {
             </DialogClose>
 
             <Button
-              type="submit"
+              type="button"
+              disabled={isPendingPrinter}
               onClick={() => mutatedPrinterTicked(saleData!)}
             >
-              Imprimir Recibo
+              {isPending ? (
+                <>
+                  <Spinner data-icon="inline-start" />
+                  Imprimiendo...
+                </>
+              ) : (
+                <>
+                  <Printer /> Imprimir Recibo
+                </>
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>

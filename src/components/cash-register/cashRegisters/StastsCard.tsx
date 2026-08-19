@@ -1,6 +1,7 @@
 import { Wallet, TrendingUp, TrendingDown, BadgePercent } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import type { CashStats } from "@/types/cash-register/cash-register.type";
+import { formatCurrency } from "@/utils";
 
 interface Props {
   stats: CashStats;
@@ -40,7 +41,7 @@ export const StatsCard = ({ stats }: Props) => {
           <div className="space-y-0.5">
             <p className="text-3xl font-bold leading-none">
               <span className="text-2xl">Bs. </span>{" "}
-              {stats.totalIncome.toLocaleString()}
+              {formatCurrency(stats.totalIncome)}
             </p>
 
             <p className="font-semibold">Total ingresos</p>
@@ -62,7 +63,7 @@ export const StatsCard = ({ stats }: Props) => {
           <div className="space-y-0.5">
             <p className="text-3xl font-bold leading-none">
               <span className="text-2xl">Bs. </span>{" "}
-              {stats.totalExpense.toLocaleString()}
+              {formatCurrency(stats.totalExpense)}
             </p>
 
             <p className="font-semibold">Total egresos</p>
@@ -74,7 +75,7 @@ export const StatsCard = ({ stats }: Props) => {
         </CardContent>
       </Card>
 
-      {/* Valor de inventario */}
+      {/* Descuentos */}
       <Card className="py-0">
         <CardContent className="flex items-center gap-5 p-6">
           <div className="flex h-20 w-20 items-center justify-center rounded-xl bg-amber-500/10">
@@ -84,7 +85,7 @@ export const StatsCard = ({ stats }: Props) => {
           <div className="space-y-0.5">
             <p className="text-3xl font-bold leading-none">
               <span className="text-2xl">Bs. </span>{" "}
-              {stats.totalDiscounts.toLocaleString()}
+              {formatCurrency(stats.totalDiscounts)}
             </p>
 
             <p className="font-semibold">Descuentos</p>

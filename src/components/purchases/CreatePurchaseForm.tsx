@@ -60,10 +60,11 @@ import {
 import { getProductsItemAction } from "@/actions/purchases/get-products-item.action";
 import { registerPurchaseAction } from "@/actions/purchases/register-purchase.action";
 import { cn } from "@/lib/utils";
-import { formatDate, getThumbnailUrl } from "@/utils";
+import { formatCurrency, formatDate, getThumbnailUrl } from "@/utils";
 import { toast } from "sonner";
 import type z from "zod";
 import { es } from "date-fns/locale";
+import { Spinner } from "../ui/spinner";
 
 export const CreatePurchaseForm = () => {
   const navigate = useNavigate();
@@ -133,7 +134,7 @@ export const CreatePurchaseForm = () => {
   };
 
   const queryClient = useQueryClient();
-  const { mutate } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: registerPurchaseAction,
     onError: (error: TypeError) => {
       toast.error(error.message);
@@ -439,8 +440,8 @@ export const CreatePurchaseForm = () => {
                                       <div className="flex items-center gap-1.5 text-xs">
                                         <span>
                                           Anterior: Bs.{" "}
-                                          {originalProduct.purchasePrice.toFixed(
-                                            2
+                                          {formatCurrency(
+                                            originalProduct.purchasePrice
                                           )}
                                         </span>
                                         {info && info.type === "up" && (
@@ -504,7 +505,9 @@ export const CreatePurchaseForm = () => {
                                       <div className="flex items-center gap-1.5 text-xs">
                                         <span>
                                           Anterior: Bs.{" "}
-                                          {originalProduct.salePrice.toFixed(2)}
+                                          {formatCurrency(
+                                            originalProduct.salePrice
+                                          )}
                                         </span>
                                         {info && info.type === "up" && (
                                           <span className="text-emerald-400 flex items-center gap-0.5">
@@ -688,10 +691,23 @@ export const CreatePurchaseForm = () => {
         <Button type="button" variant="outline" onClick={handleClose}>
           Cancelar
         </Button>
-        <Button type="submit" disabled={!form.getValues("items").length}>
-          Aceptar
+
+        <Button
+          type="submit"
+          disabled={!form.getValues("items").length || isPending}
+        >
+          {isPending ? (
+            <>
+              <Spinner data-icon="inline-start" />
+              Cargando...
+            </>
+          ) : (
+            "Aceptar"
+          )}
         </Button>
       </div>
     </form>
   );
 };
+
+// Falta terminal lo de compras -> Nueva compra

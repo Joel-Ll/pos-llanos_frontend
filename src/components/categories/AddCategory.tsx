@@ -1,15 +1,18 @@
-import { useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
-import { Plus } from 'lucide-react';
-import { Field, FieldError, FieldLabel } from '@/components/ui/field';
+import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { Plus } from "lucide-react";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { categoryFormSchema, type CategoryFormValues } from '@/types/categories/categories.types';
-import { createCategoryAction } from '@/actions/categories/create-category.action';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  categoryFormSchema,
+  type CategoryFormValues,
+} from "@/types/categories/categories.types";
+import { createCategoryAction } from "@/actions/categories/create-category.action";
 import {
   Dialog,
   DialogContent,
@@ -18,8 +21,9 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Textarea } from '@/components/ui/textarea';
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { Spinner } from "../ui/spinner";
 
 export default function AddCategory() {
   const [open, setOpen] = useState(false);
@@ -27,33 +31,33 @@ export default function AddCategory() {
   const form = useForm<CategoryFormValues>({
     resolver: zodResolver(categoryFormSchema),
     defaultValues: {
-      name: '',
-      description: ''
-    }
+      name: "",
+      description: "",
+    },
   });
 
   const queryClient = useQueryClient();
-  const { mutate } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: createCategoryAction,
     onError: (err: TypeError) => {
-      toast.error(err.message)
+      toast.error(err.message);
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['categories'] })
-      queryClient.invalidateQueries({ queryKey: ['categories-select'] })
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+      queryClient.invalidateQueries({ queryKey: ["categories-select"] });
       toast.success(data);
-    }
+    },
   });
 
   const onSubmit = (formData: CategoryFormValues) => {
-    mutate(formData)
+    mutate(formData);
     handleClose();
-  }
+  };
 
   const handleClose = () => {
     setOpen(false);
     form.reset();
-  }
+  };
 
   return (
     <Dialog
@@ -65,9 +69,8 @@ export default function AddCategory() {
         }
       }}
     >
-      
       <DialogTrigger asChild>
-        <Button className='gap-2 w-full md:w-fit' onClick={() => setOpen(true)}>
+        <Button className="gap-2 w-full md:w-fit" onClick={() => setOpen(true)}>
           <Plus className="h-5 w-5" />
           Nueva Categoría
         </Button>
@@ -81,7 +84,10 @@ export default function AddCategory() {
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3 md:space-y-4">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="space-y-3 md:space-y-4"
+        >
           <Controller
             control={form.control}
             name="name"
@@ -94,9 +100,11 @@ export default function AddCategory() {
                   aria-invalid={fieldState.invalid}
                   placeholder="Art. Electricos"
                   autoComplete="off"
-                  className='bg-secondary/50'
+                  className="bg-secondary/50"
                 />
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
               </Field>
             )}
           />
@@ -106,32 +114,42 @@ export default function AddCategory() {
             name="description"
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor={field.name}>Descripción (Opcional)</FieldLabel>
+                <FieldLabel htmlFor={field.name}>
+                  Descripción (Opcional)
+                </FieldLabel>
                 <Textarea
                   {...field}
                   id={field.name}
                   aria-invalid={fieldState.invalid}
                   placeholder="Cables eléctricos y de conexión"
                   autoComplete="off"
-                  className='bg-secondary/50'
+                  className="bg-secondary/50"
                 />
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
               </Field>
             )}
           />
 
           <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleClose}
-            >
+            <Button type="button" variant="outline" onClick={handleClose}>
               Cancelar
             </Button>
-            <Button type="submit">Aceptar</Button>
+
+            <Button type="submit" disabled={isPending}>
+              {isPending ? (
+                <>
+                  <Spinner data-icon="inline-start" />
+                  Cargando...
+                </>
+              ) : (
+                "Aceptar"
+              )}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

@@ -1,6 +1,7 @@
 import { ShoppingCart, FilePen, ClipboardCheck, BookmarkX } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import type { PurchaseStats } from "@/types/purchases/purchases-type";
+import { formatCurrency } from "@/utils";
 
 interface Props {
   stats: PurchaseStats;
@@ -82,7 +83,7 @@ export const StatsCard = ({ stats }: Props) => {
           <div className="space-y-0.5">
             <p className="text-3xl font-bold leading-none">
               <span className="text-2xl">Bs. </span>{" "}
-              {stats.totalAmount.toLocaleString()}
+              {formatCurrency(stats.totalAmount)}
             </p>
 
             <p className="font-semibold">Total comprado</p>

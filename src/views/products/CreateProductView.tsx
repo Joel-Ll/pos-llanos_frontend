@@ -34,6 +34,7 @@ import {
 } from "@/types/products/products.type";
 import type { SupplierSelect } from "@/types/suppliers/suppliers.type";
 import { createProductAction } from "@/actions/products/create-product.action";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function CreateProductView() {
   const navigate = useNavigate();
@@ -68,7 +69,7 @@ export default function CreateProductView() {
   });
 
   const queryClient = useQueryClient();
-  const { mutate } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: createProductAction,
     onError: (error: TypeError) => {
       toast.error(error.message);
@@ -410,7 +411,16 @@ export default function CreateProductView() {
                 >
                   Cancelar
                 </Button>
-                <Button type="submit">Registrar Producto</Button>
+                <Button type="submit" disabled={isPending}>
+                  {isPending ? (
+                    <>
+                      <Spinner data-icon="inline-start" />
+                      Cargando...
+                    </>
+                  ) : (
+                    "Registrar Producto"
+                  )}
+                </Button>
               </div>
             </form>
           </Form>

@@ -1,21 +1,29 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router'
+import { useState } from "react";
+import { useNavigate } from "react-router";
 
-import type { ColumnDef } from "@tanstack/react-table"
-import { CheckCircle, Edit2, EyeIcon, MoreHorizontal, Tag, XCircle } from "lucide-react"
+import type { ColumnDef } from "@tanstack/react-table";
+import {
+  CheckCircle,
+  Edit2,
+  EyeIcon,
+  MoreHorizontal,
+  Tag,
+  XCircle,
+} from "lucide-react";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Badge } from '@/components/ui/badge';
+} from "@/components/ui/dropdown-menu";
+import { Badge } from "@/components/ui/badge";
 
-import type { Category } from '@/types/categories/categories.types'
-import EditCategory from './EditCategory'
-import { ChangeState } from './ChangeState'
+import type { Category } from "@/types/categories/categories.types";
+import EditCategory from "./EditCategory";
+import { ChangeState } from "./ChangeState";
+import { formatCurrency } from "@/utils";
 
 export const columns: ColumnDef<Category>[] = [
   {
@@ -25,7 +33,8 @@ export const columns: ColumnDef<Category>[] = [
       const navigate = useNavigate();
       const categoryId = row.original._id;
       return (
-        <div className="flex items-center gap-2 "
+        <div
+          className="flex items-center gap-2 "
           onClick={() => navigate(`/categories/view/${categoryId}`)}
         >
           <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
@@ -33,53 +42,57 @@ export const columns: ColumnDef<Category>[] = [
           </div>
           <p className="font-medium cursor-pointer">{row.original.name}</p>
         </div>
-      )
-    }
+      );
+    },
   },
   {
     accessorKey: "totalProducts",
-    header: () => <div className='text-center'>Productos</div>,
+    header: () => <div className="text-center">Productos</div>,
     cell: ({ row }) => {
       return (
         <div className="flex flex-col items-center">
-          <p className='font-semibold'>{row.original.totalProducts}</p>
-          <p className='text-muted-foreground text-xs'>Productos</p>
+          <p className="font-semibold">{row.original.totalProducts}</p>
+          <p className="text-muted-foreground text-xs">Productos</p>
         </div>
-      )
-    }
+      );
+    },
   },
 
   {
     accessorKey: "stockTotal",
-    header: () => <div className='text-center'>Stock total</div>,
+    header: () => <div className="text-center">Stock total</div>,
     cell: ({ row }) => {
       return (
         <div className="flex flex-col items-center">
-          <p className='font-semibold'>{row.original.stockTotal}</p>
-          <p className='text-muted-foreground text-xs'>unidades</p>
+          <p className="font-semibold">{row.original.stockTotal}</p>
+          <p className="text-muted-foreground text-xs">unidades</p>
         </div>
-      )
-    }
+      );
+    },
   },
   {
     accessorKey: "inventoryValue",
     header: () => <div className="text-right">Valor inventario</div>,
     cell: ({ row }) => {
       return (
-        <p className='font-bold text-right'>Bs. <span className='font-normal text-muted-foreground'>{row.original.inventoryValue.toLocaleString()}</span></p>
-      )
-    }
+        <p className="font-bold text-right">
+          Bs.
+          <span className="font-normal text-muted-foreground">
+            {formatCurrency(row.original.inventoryValue)}
+          </span>
+        </p>
+      );
+    },
   },
   {
     accessorKey: "isActive",
     header: "Estado",
     cell: ({ row }) => {
-      const isActive: boolean = row.getValue('isActive');
+      const isActive: boolean = row.getValue("isActive");
 
       return (
         <>
           {isActive ? (
-
             <Badge className="bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300">
               Activo
             </Badge>
@@ -90,13 +103,13 @@ export const columns: ColumnDef<Category>[] = [
           )}
         </>
       );
-    }
+    },
   },
 
   {
     id: "actions",
     cell: ({ row }) => {
-      const categoryId = row.original._id
+      const categoryId = row.original._id;
       const navigate = useNavigate();
       const [open, setOpen] = useState(false);
       const [openChange, setOpenChange] = useState(false);
@@ -111,18 +124,23 @@ export const columns: ColumnDef<Category>[] = [
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => navigate(`/categories/view/${categoryId}`)} >
+              <DropdownMenuItem
+                onClick={() => navigate(`/categories/view/${categoryId}`)}
+              >
                 <EyeIcon />
                 Ver
               </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => setOpen(true)}
-              >
+              <DropdownMenuItem onClick={() => setOpen(true)}>
                 <Edit2 />
                 Editar
               </DropdownMenuItem>
 
-              <DropdownMenuItem variant={row.original.isActive === true ? 'destructive' : 'default'} onClick={() => setOpenChange(true)}>
+              <DropdownMenuItem
+                variant={
+                  row.original.isActive === true ? "destructive" : "default"
+                }
+                onClick={() => setOpenChange(true)}
+              >
                 {row.original.isActive === true ? (
                   <>
                     <XCircle />
@@ -152,7 +170,7 @@ export const columns: ColumnDef<Category>[] = [
             state={row.original.isActive}
           />
         </>
-      )
+      );
     },
   },
-]
+];

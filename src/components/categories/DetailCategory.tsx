@@ -26,6 +26,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import EditCategory from "./EditCategory";
+import { formatCurrency } from "@/utils";
 
 interface Props {
   data: CategoryWithProducts;
@@ -174,7 +175,7 @@ export const DetailCategory = ({ data }: Props) => {
                 <div className="space-y-0.5">
                   <p className="text-3xl font-bold leading-none">
                     <span className="text-2xl">Bs. </span>{" "}
-                    {data.stats.inventoryValue.toLocaleString()}
+                    {formatCurrency(data.stats.inventoryValue)}
                   </p>
 
                   <p className="font-semibold">Valor inventario</p>

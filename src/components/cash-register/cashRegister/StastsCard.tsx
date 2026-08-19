@@ -1,6 +1,7 @@
 import { Wallet, BadgePercent, Banknote, QrCode } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import type { StatCash } from "@/types/cash-register/cash-register.type";
+import { formatCurrency } from "@/utils";
 
 interface Props {
   stats: StatCash;
@@ -20,7 +21,7 @@ export const StatsCard = ({ stats }: Props) => {
             <p className="text-sm text-muted-foreground">Total ingresos</p>
 
             <p className="text-2xl font-bold leading-none">
-              Bs. {stats.totalIncome.toLocaleString()}
+              Bs. {formatCurrency(stats.totalIncome)}
             </p>
 
             <p className="text-sm text-muted-foreground">
@@ -41,7 +42,7 @@ export const StatsCard = ({ stats }: Props) => {
             <p className="text-sm text-muted-foreground">Efectivo</p>
 
             <p className="text-2xl font-bold leading-none text-sky-600">
-              Bs. {stats.cashIncome.toLocaleString()}
+              Bs. {formatCurrency(stats.cashIncome)}
             </p>
 
             <p className="text-sm text-muted-foreground">
@@ -61,9 +62,8 @@ export const StatsCard = ({ stats }: Props) => {
           <div className="space-y-0.5">
             <p className="font-semibold">QR</p>
             <p className="text-2xl font-bold leading-none text-violet-600">
-              Bs. {stats.qrIncome.toLocaleString()}
+              Bs. {formatCurrency(stats.qrIncome)}
             </p>
-
             <p className="text-sm text-muted-foreground">Recibido en QR.</p>
           </div>
         </CardContent>

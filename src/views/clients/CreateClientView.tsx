@@ -1,16 +1,34 @@
-import { useNavigate } from 'react-router';
-import { Controller, useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
+import { useNavigate } from "react-router";
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { clientFormSchema, typeClient, typeDocument, type ClientFormValues } from '@/types/clients/clients.type';
-import { createClientAction } from '@/actions/clients/create-client.action';
-import { Field, FieldError, FieldLabel } from '@/components/ui/field';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  clientFormSchema,
+  typeClient,
+  typeDocument,
+  type ClientFormValues,
+} from "@/types/clients/clients.type";
+import { createClientAction } from "@/actions/clients/create-client.action";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function CreateClientView() {
   const navigate = useNavigate();
@@ -18,36 +36,36 @@ export default function CreateClientView() {
   const form = useForm<ClientFormValues>({
     resolver: zodResolver(clientFormSchema),
     defaultValues: {
-      razonSocial: '',
-      typeClient: '',
-      tipoDocumento: '',
-      documentoId: '',
-      phone: '',
-      email: ''
-    }
+      razonSocial: "",
+      typeClient: "",
+      tipoDocumento: "",
+      documentoId: "",
+      phone: "",
+      email: "",
+    },
   });
 
   const queryClient = useQueryClient();
-  const { mutate } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: createClientAction,
     onError: (err: TypeError) => {
-      toast.error(err.message)
+      toast.error(err.message);
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['clients'] })
+      queryClient.invalidateQueries({ queryKey: ["clients"] });
       toast.success(data);
-    }
+    },
   });
 
   const onSubmit = (formData: ClientFormValues) => {
-    mutate(formData)
+    mutate(formData);
     handleClose();
-  }
+  };
 
   const handleClose = () => {
     form.reset();
     navigate(-1);
-  }
+  };
 
   return (
     <div data-aos="fade-in" data-aos-duration="300">
@@ -60,10 +78,7 @@ export default function CreateClientView() {
         </CardHeader>
 
         <CardContent>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-6"
-          >
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             {/* 🧑 DATOS PRINCIPALES */}
             <div className="rounded-lg border p-4 space-y-4">
               <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
@@ -83,7 +98,9 @@ export default function CreateClientView() {
                           {...field}
                           placeholder="Ej. Juan Pérez / Empresa S.R.L."
                         />
-                        {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                        {fieldState.invalid && (
+                          <FieldError errors={[fieldState.error]} />
+                        )}
                       </Field>
                     )}
                   />
@@ -92,24 +109,29 @@ export default function CreateClientView() {
                 <div className="grid md:grid-cols-2 gap-4">
                   {/* Tipo Cliente */}
                   <Controller
-                    name='typeClient'
+                    name="typeClient"
                     control={form.control}
                     render={({ field, fieldState }) => (
                       <Field data-invalid={fieldState.invalid}>
                         <FieldLabel>Tipo Cliente *</FieldLabel>
-                        <Select value={field.value} onValueChange={field.onChange}>
+                        <Select
+                          value={field.value}
+                          onValueChange={field.onChange}
+                        >
                           <SelectTrigger>
                             <SelectValue placeholder="Seleccione" />
                           </SelectTrigger>
                           <SelectContent>
-                            {typeClient?.map(item => (
+                            {typeClient?.map((item) => (
                               <SelectItem key={item.id} value={item.value}>
                                 {item.label}
                               </SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
-                        {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                        {fieldState.invalid && (
+                          <FieldError errors={[fieldState.error]} />
+                        )}
                       </Field>
                     )}
                   />
@@ -126,24 +148,29 @@ export default function CreateClientView() {
               <div className="grid md:grid-cols-2 gap-4">
                 {/* Tipo Documento */}
                 <Controller
-                  name='tipoDocumento'
+                  name="tipoDocumento"
                   control={form.control}
                   render={({ field, fieldState }) => (
                     <Field data-invalid={fieldState.invalid}>
                       <FieldLabel>Tipo Documento *</FieldLabel>
-                      <Select value={field.value} onValueChange={field.onChange}>
+                      <Select
+                        value={field.value}
+                        onValueChange={field.onChange}
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder="Seleccione" />
                         </SelectTrigger>
                         <SelectContent>
-                          {typeDocument?.map(item => (
+                          {typeDocument?.map((item) => (
                             <SelectItem key={item.id} value={item.value}>
                               {item.label}
                             </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
-                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
                     </Field>
                   )}
                 />
@@ -156,7 +183,9 @@ export default function CreateClientView() {
                     <Field data-invalid={fieldState.invalid}>
                       <FieldLabel>Nro Documento *</FieldLabel>
                       <Input {...field} placeholder="Ej. 723..." />
-                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
                     </Field>
                   )}
                 />
@@ -178,7 +207,9 @@ export default function CreateClientView() {
                     <Field data-invalid={fieldState.invalid}>
                       <FieldLabel>Teléfono</FieldLabel>
                       <Input {...field} placeholder="Ej. 7254..." />
-                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
                     </Field>
                   )}
                 />
@@ -191,7 +222,9 @@ export default function CreateClientView() {
                     <Field data-invalid={fieldState.invalid}>
                       <FieldLabel>Email</FieldLabel>
                       <Input {...field} placeholder="cliente@email.com" />
-                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
                     </Field>
                   )}
                 />
@@ -199,7 +232,7 @@ export default function CreateClientView() {
             </div>
 
             {/* 🚀 FOOTER */}
-            <div className='flex gap-4 justify-end'>
+            <div className="flex gap-4 justify-end">
               <Button
                 type="button"
                 variant="outline"
@@ -207,13 +240,21 @@ export default function CreateClientView() {
               >
                 Cancelar
               </Button>
-              <Button type="submit">
-                Registrar Cliente
+
+              <Button type="submit" disabled={isPending}>
+                {isPending ? (
+                  <>
+                    <Spinner data-icon="inline-start" />
+                    Cargando...
+                  </>
+                ) : (
+                  "Aceptar"
+                )}
               </Button>
             </div>
           </form>
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

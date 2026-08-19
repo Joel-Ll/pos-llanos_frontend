@@ -31,6 +31,7 @@ import {
 import { createAdjustementAction } from "@/actions/adjustments/create-adjustment.action";
 import { getProductsAction } from "@/actions/products/get-products.action";
 import { SelectProducts } from "./SelectProducts";
+import { Spinner } from "../ui/spinner";
 
 const decreaseReasons = [
   { label: "Producto dañado", id: 1 },
@@ -71,7 +72,7 @@ export const AdjustmentsForm = () => {
   });
 
   const queryClient = useQueryClient();
-  const { mutate } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: createAdjustementAction,
     onError: (error: TypeError) => {
       toast.error(error.message);
@@ -90,6 +91,7 @@ export const AdjustmentsForm = () => {
     value: p._id,
     internalCode: p.internalCode ?? "",
     catalogCode: p.catalogCode ?? "",
+    brand: p.brand ?? "",
     description: p.description,
     image: p.image ?? "",
     stock: p.currentStock,
@@ -295,9 +297,23 @@ export const AdjustmentsForm = () => {
           </div>
 
           <div className="flex justify-end mt-10">
-            <Button type="submit" form="form-rhf-demo" className="gap-2">
-              <ArrowUpDown className="h-4 w-4" />
-              Registrar Ajuste
+            <Button
+              type="submit"
+              form="form-rhf-demo"
+              className="gap-2"
+              disabled={isPending}
+            >
+              {isPending ? (
+                <>
+                  <Spinner data-icon="inline-start" />
+                  Cargando...
+                </>
+              ) : (
+                <>
+                  <ArrowUpDown className="h-4 w-4" />
+                  Registrar Ajuste
+                </>
+              )}
             </Button>
           </div>
         </form>

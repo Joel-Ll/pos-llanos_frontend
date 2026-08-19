@@ -2,7 +2,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
 import type { CategoryProduct } from "@/types/categories/categories.types";
 import { Package } from "lucide-react";
-import { getThumbnailUrl } from "@/utils";
+import { formatCurrency, getThumbnailUrl } from "@/utils";
 
 const getStockStatus = (current: number, min: number) => {
   if (current === 0)
@@ -125,7 +125,7 @@ export const columns: ColumnDef<CategoryProduct>[] = [
     header: () => <div className="text-right">P. Compra</div>,
     cell: ({ row }) => (
       <div className="text-right">
-        Bs. {row.original.purchasePrice.toLocaleString()}
+        Bs. {formatCurrency(row.original.purchasePrice)}
       </div>
     ),
   },
@@ -135,7 +135,7 @@ export const columns: ColumnDef<CategoryProduct>[] = [
     header: () => <div className="text-right">P. Venta</div>,
     cell: ({ row }) => (
       <div className="text-right">
-        Bs. {row.original.salePrice.toLocaleString()}
+        Bs. {formatCurrency(row.original.salePrice)}
       </div>
     ),
   },

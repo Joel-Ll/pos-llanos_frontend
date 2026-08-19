@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -15,35 +15,37 @@ import {
 } from "@/components/ui/popover";
 import { Check, ChevronsUpDown, Package } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { getThumbnailUrl } from '@/utils';
+import { getThumbnailUrl } from "@/utils";
+import { Badge } from "../ui/badge";
 
 export interface SearchableSelectOption {
-  value:         string;
-  internalCode:  string;   // código interno  → búsqueda
-  catalogCode:   string;   // código catálogo → búsqueda
-  description:   string;   // descripción     → búsqueda
-  image:         string;
-  stock:         number;
+  value: string;
+  internalCode: string; // código interno  → búsqueda
+  catalogCode: string; // código catálogo → búsqueda
+  description: string; // descripción     → búsqueda
+  brand: string;
+  image: string;
+  stock: number;
 }
 
 interface Props {
-  options?:           SearchableSelectOption[];
-  value?:             string;
-  onValueChange?:     (value: string) => void;
-  placeholder?:       string;
+  options?: SearchableSelectOption[];
+  value?: string;
+  onValueChange?: (value: string) => void;
+  placeholder?: string;
   searchPlaceholder?: string;
-  emptyMessage?:      string;
-  className?:         string;
-  disabled?:          boolean;
+  emptyMessage?: string;
+  className?: string;
+  disabled?: boolean;
 }
 
 export const SelectProducts = ({
   options,
   value,
   onValueChange,
-  placeholder       = "Seleccionar producto...",
+  placeholder = "Seleccionar producto...",
   searchPlaceholder = "Buscar por código o descripción...",
-  emptyMessage      = "Sin resultados",
+  emptyMessage = "Sin resultados",
   className,
   disabled,
 }: Props) => {
@@ -79,16 +81,18 @@ export const SelectProducts = ({
           >
             {selectedOption ? (
               <div className="flex items-center gap-2 min-w-0">
-                {selectedOption.image ? (
-                  <img
-                    src={getThumbnailUrl(selectedOption.image)}
-                    alt={selectedOption.description}
-                    className="w-5 h-5 rounded object-cover shrink-0"
-                  />
-                ) : (
-                  <Package className="w-4 h-4 shrink-0 text-muted-foreground" />
-                )}
-                <span className="truncate">{selectedOption.description}</span>
+                <p className="truncate text-sm">
+                  {selectedOption.description}
+                  {" - "}
+                  <span className="text-muted-foreground">
+                    {selectedOption.catalogCode}
+                  </span>
+
+                  {" - "}
+                  <span className="text-muted-foreground">
+                    {selectedOption.brand}
+                  </span>
+                </p>
               </div>
             ) : (
               <span>{placeholder}</span>
@@ -98,7 +102,7 @@ export const SelectProducts = ({
         </PopoverTrigger>
 
         <PopoverContent
-          className="w-[--radix-popover-trigger-width] p-0"
+          className="w-[500px] max-w-[calc(100vw-2rem)] p-0"
           align="start"
         >
           <Command
@@ -118,7 +122,7 @@ export const SelectProducts = ({
                     key={option.value}
                     value={searchValue(option)}
                     onSelect={() => handleSelect(option)}
-                    className="cursor-pointer"
+                    className="flex min-w-0 items-center"
                   >
                     <Check
                       className={cn(
@@ -127,32 +131,48 @@ export const SelectProducts = ({
                       )}
                     />
 
-                    {option.image ? (
-                      <img
-                        src={getThumbnailUrl(option.image)}
-                        alt={option.description}
-                        className="w-10 h-10 rounded object-cover shrink-0"
-                      />
-                    ) : (
-                      <div className="w-8 h-8 bg-muted flex items-center justify-center rounded shrink-0">
-                        <Package className="w-4 h-4 text-muted-foreground" />
-                      </div>
-                    )}
+                    <div className="flex items-center gap-3">
+                      {option.image ? (
+                        <img
+                          src={getThumbnailUrl(option.image)}
+                          alt={option.description}
+                          className="w-15 h-15 rounded object-cover shrink-0"
+                        />
+                      ) : (
+                        <div className="w-15 h-15 bg-muted flex items-center justify-center rounded">
+                          <Package className="w-4 h-4" />
+                        </div>
+                      )}
 
-                    <div className="ml-2 min-w-0 flex-1">
-                      <p className="text-xs font-medium truncate">{option.description}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {option.internalCode}
-                        {option.catalogCode ? ` · ${option.catalogCode}` : ''}
-                      </p>
+                      <div className="ml-2 min-w-0 flex-1">
+                        <p
+                          className="text-xs font-medium text-ellipsis"
+                          title={option.description}
+                        >
+                          {option.description}
+                        </p>
+
+                        <p className="text-xs text-muted-foreground">
+                          #{option.internalCode} -{" "}
+                          {option.catalogCode === ""
+                            ? "s/n"
+                            : option.catalogCode}
+                        </p>
+
+                        <Badge variant="outline" className="text-xs">
+                          {option.brand}
+                        </Badge>
+                      </div>
                     </div>
 
-                    <span className={cn(
-                      "ml-auto text-xs px-1.5 py-0.5 rounded-full shrink-0",
-                      option.stock > 0
-                        ? "bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300"
-                        : "bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-300"
-                    )}>
+                    <span
+                      className={cn(
+                        "ml-auto text-xs px-1.5 py-0.5 rounded-full shrink-0",
+                        option.stock > 0
+                          ? "bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300"
+                          : "bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-300"
+                      )}
+                    >
                       {option.stock}
                     </span>
                   </CommandItem>
@@ -166,10 +186,12 @@ export const SelectProducts = ({
       {selectedOption && (
         <p className="text-xs text-muted-foreground">
           Stock actual:{" "}
-          <span className={cn(
-            "font-semibold",
-            selectedOption.stock > 0 ? "text-green-600" : "text-red-500"
-          )}>
+          <span
+            className={cn(
+              "font-semibold",
+              selectedOption.stock > 0 ? "text-green-600" : "text-red-500"
+            )}
+          >
             {selectedOption.stock}
           </span>{" "}
           unidades

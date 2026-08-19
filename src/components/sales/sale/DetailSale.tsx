@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
+import { useMutation } from "@tanstack/react-query";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -22,16 +23,19 @@ import {
   FileText,
   Layers2,
   Percent,
+  PercentCircleIcon,
   PiggyBank,
-  QrCode,
   ShoppingCart,
   TrendingUp,
   X,
 } from "lucide-react";
 import { formatDate } from "date-fns";
-import { formatCurrency } from "@/utils";
+import { formatCurrency, mapSaleToPrint } from "@/utils";
 import { cn } from "@/lib/utils";
 import { CancelSale } from "../CancelSale";
+import { printTicketAction } from "@/actions/printer-ticked/printTicketAction";
+import { toast } from "sonner";
+import { Spinner } from "@/components/ui/spinner";
 
 const Row = ({
   label,
@@ -57,6 +61,17 @@ export default function DetailSale({ data }: Props) {
   const subtProducts = data.items.reduce((acc, i) => i.subtotal + acc, 0);
   const subServices = data.services.reduce((acc, s) => s.amount + acc, 0);
   const [openCancel, setOpenCancel] = useState(false);
+
+  const { mutate: mutatedPrinterTicked, isPending } = useMutation({
+    mutationFn: printTicketAction,
+    onError: (error: TypeError) => {
+      toast.error(error.message);
+    },
+    onSuccess: () => {
+      return "ok";
+    },
+  });
+
   return (
     <>
       <div data-aos="fade-in" className="space-y-8" data-aos-duration="300">
@@ -126,24 +141,36 @@ export default function DetailSale({ data }: Props) {
 
               {/* Acciones */}
               <div className="flex w-full flex-col gap-3 md:flex-row  md:w-auto">
-                <Button
-                  variant="outline"
-                  // onClick={() => setOpen(true)}
-                  className="w-full md:w-auto"
-                >
-                  <FileText className="mr-2 h-4 w-4" />
-                  Imprimir
-                </Button>
-
                 {data.status === "registered" && (
-                  <Button
-                    onClick={() => setOpenCancel(true)}
-                    className="w-full md:w-auto "
-                    variant={"outline"}
-                  >
-                    <X className="mr-2 h-4 w-4" />
-                    Cancelar Venta
-                  </Button>
+                  <>
+                    <Button
+                      variant="outline"
+                      disabled={isPending}
+                      onClick={() => mutatedPrinterTicked(mapSaleToPrint(data))}
+                      className="w-full md:w-auto"
+                    >
+                      {isPending ? (
+                        <>
+                          <Spinner data-icon="inline-start" />
+                          Cargando...
+                        </>
+                      ) : (
+                        <>
+                          <FileText className="mr-2 h-4 w-4" />
+                          Imprimir
+                        </>
+                      )}
+                    </Button>
+
+                    <Button
+                      onClick={() => setOpenCancel(true)}
+                      className="w-full md:w-auto "
+                      variant={"outline"}
+                    >
+                      <X className="mr-2 h-4 w-4" />
+                      Cancelar Venta
+                    </Button>
+                  </>
                 )}
               </div>
             </div>
@@ -163,7 +190,7 @@ export default function DetailSale({ data }: Props) {
                 <p className="font-semibold">Total de la Venta</p>
 
                 <p className="text-2xl font-bold leading-none text-lime-600">
-                  Bs. {data.totalAmount.toLocaleString()}
+                  Bs. {formatCurrency(data.totalAmount)}
                 </p>
 
                 <p className="text-sm text-muted-foreground">
@@ -184,7 +211,7 @@ export default function DetailSale({ data }: Props) {
                 <p className="font-semibold">Ganancia Total</p>
 
                 <p className="text-2xl font-bold leading-none text-sky-600">
-                  Bs. {data.totalProfit.toLocaleString()}
+                  Bs. {formatCurrency(data.totalProfit)}
                 </p>
 
                 <p className="text-sm text-muted-foreground">
@@ -204,7 +231,7 @@ export default function DetailSale({ data }: Props) {
               <div className="space-y-0.5">
                 <p className="font-semibold">Descuento</p>
                 <p className="text-2xl font-bold leading-none text-amber-600">
-                  Bs. {data.globalDiscount.toLocaleString()}
+                  Bs. {formatCurrency(data.globalDiscount)}
                 </p>
 
                 <p className="text-sm text-muted-foreground">
@@ -339,6 +366,7 @@ export default function DetailSale({ data }: Props) {
                 </div>
               </CardContent>
             </Card>
+
             {/* Tabla de Servicios */}
             <Card>
               <CardContent>
@@ -426,11 +454,11 @@ export default function DetailSale({ data }: Props) {
                 <div className="p-2  space-y-2">
                   <Row
                     label="Subtotal Productos"
-                    value={`Bs. ${subtProducts.toLocaleString()}`}
+                    value={`Bs. ${formatCurrency(subtProducts)}`}
                   />
                   <Row
                     label="Subtotal Servicios"
-                    value={`Bs. ${subServices.toLocaleString()}`}
+                    value={`Bs. ${formatCurrency(subServices)}`}
                   />
 
                   <hr className="border-border" />
@@ -441,15 +469,15 @@ export default function DetailSale({ data }: Props) {
                         <Banknote className="w-3 h-3" /> Subtotal
                       </span>
                     }
-                    value={`Bs. ${subtProducts + subServices}`}
+                    value={`Bs. ${formatCurrency(subtProducts + subServices)}`}
                   />
                   <Row
                     label={
                       <span className="flex items-center gap-1">
-                        <QrCode className="w-3 h-3" /> Descuento
+                        <PercentCircleIcon className="w-3 h-3" /> Descuento
                       </span>
                     }
-                    value={`Bs. ${data.globalDiscount.toLocaleString()}`}
+                    value={`Bs. ${formatCurrency(data.globalDiscount)}`}
                   />
                 </div>
 
@@ -465,7 +493,7 @@ export default function DetailSale({ data }: Props) {
                         <p className="font-semibold">Ganancia Total</p>
 
                         <p className="text-2xl font-bold leading-none text-emerald-600">
-                          Bs. {data.totalProfit.toLocaleString()}
+                          Bs. {formatCurrency(data.totalProfit)}
                         </p>
                       </div>
                     </CardContent>

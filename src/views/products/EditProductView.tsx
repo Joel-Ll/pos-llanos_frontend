@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import UploadImage from "@/components/UploadImage";
+import { Spinner } from "@/components/ui/spinner";
 import {
   productFormSchema,
   unitType,
@@ -77,7 +78,7 @@ export default function EditProductView() {
   });
 
   const queryClient = useQueryClient();
-  const { mutate } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: updateProductAction,
     onError: (error: TypeError) => {
       toast.error(error.message);
@@ -452,7 +453,17 @@ export default function EditProductView() {
                 >
                   Cancelar
                 </Button>
-                <Button type="submit">Guardar Cambios</Button>
+
+                <Button type="submit" disabled={isPending}>
+                  {isPending ? (
+                    <>
+                      <Spinner data-icon="inline-start" />
+                      Cargando...
+                    </>
+                  ) : (
+                    "Guardar Cambios"
+                  )}
+                </Button>
               </div>
             </form>
           </Form>

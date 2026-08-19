@@ -1,6 +1,7 @@
 import { Box, CheckCircle2, PackageX, Tags } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import type { CategoriesStats } from "@/types/categories/categories.types";
+import { formatCurrency } from "@/utils";
 
 interface Props {
   stats: CategoriesStats;
@@ -80,7 +81,7 @@ export const StatsCard = ({ stats }: Props) => {
           <div className="space-y-0.5">
             <p className="text-3xl font-bold leading-none">
               <span className="text-2xl">Bs. </span>{" "}
-              {stats.totalInventoryValue.toLocaleString()}
+              {formatCurrency(stats.totalInventoryValue)}
             </p>
 
             <p className="font-semibold">Valor inventario</p>

@@ -1,6 +1,7 @@
 import { Truck, ClipboardCheck, Star, CircleDollarSign } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import type { SupplierStats } from "@/types/suppliers/suppliers.type";
+import { formatCurrency } from "@/utils";
 
 interface Props {
   stats: SupplierStats;
@@ -81,7 +82,7 @@ export const StatsCard = ({ stats }: Props) => {
         </CardContent>
       </Card>
 
-      {/* Categorías sin productos */}
+      {/* Total comprado */}
       <Card className="py-0">
         <CardContent className="flex items-center gap-5 p-6">
           <div className="flex h-20 w-20 items-center justify-center rounded-xl bg-amber-500/10">
@@ -91,7 +92,7 @@ export const StatsCard = ({ stats }: Props) => {
           <div className="space-y-0.5">
             <p className="text-3xl font-bold leading-none">
               <span className="text-2xl">Bs. </span>{" "}
-              {stats.totalAmount.toLocaleString()}
+              {formatCurrency(stats.totalAmount)}
             </p>
 
             <p className="font-semibold">Total comprado</p>

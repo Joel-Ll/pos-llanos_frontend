@@ -1,15 +1,18 @@
-import { useQuery } from "@tanstack/react-query"
+import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
-import { StatsCard } from "@/components/dashboard/StatsCard"
-import { getStastDashboardAction } from "@/actions/dashboard/get-stats-dashboard.action"
+import { StatsCard } from "@/components/dashboard/StatsCard";
+import { FullScreenLoader } from "@/components/ui/loader-full-screen";
+import { getStastDashboardAction } from "@/actions/dashboard/get-stats-dashboard.action";
 
 export default function DashboardView() {
   const { data: userData } = useAuth();
   const { data, isLoading } = useQuery({
-    queryKey: ['dashboard'],
+    queryKey: ["dashboard"],
     queryFn: getStastDashboardAction,
     retry: false,
-  })
+  });
+
+  if (isLoading) return <FullScreenLoader text="Cargando..." />;
 
   return (
     <div
@@ -18,9 +21,7 @@ export default function DashboardView() {
       className="min-h-full flex justify-center pt-5 lg:pt-20"
     >
       <div className="w-full max-w-7xl space-y-4">
-        {isLoading ? (
-          <div>Cargando...</div>
-        ) : data ? (
+        {data ? (
           <>
             <div className="text-center">
               <h1 className="text-4xl font-bold tracking-tight">
@@ -39,5 +40,5 @@ export default function DashboardView() {
         )}
       </div>
     </div>
-  )
+  );
 }
