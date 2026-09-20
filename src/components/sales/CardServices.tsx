@@ -5,38 +5,40 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Field, FieldLabel } from "@/components/ui/field";
-import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from "@/components/ui/input-group";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
+} from "@/components/ui/input-group";
 
 import type { SalesFormValues } from "@/types/sales/sales.type";
 import { Plus, Wrench } from "lucide-react";
 import { generateUniqueId } from "@/utils";
 
 interface Props {
-  setValue: UseFormSetValue<SalesFormValues>
+  setValue: UseFormSetValue<SalesFormValues>;
   services: {
     description: string;
     amount: number;
     id: number;
   }[];
-  amountServices: number
+  amountServices: number;
 }
 
-export default function CardServices({
-  setValue,
-  services,
-}: Props) {
-
+export default function CardServices({ setValue, services }: Props) {
   const [description, setDescription] = useState("");
-  const [amount, setAmount] = useState<number>(0);
+  const [amount, setAmount] = useState("");
 
   const addService = () => {
     if (!description.trim()) return;
-    if (amount <= 0) return;
+    const numericAmount = Number(amount);
+    if (numericAmount <= 0) return;
 
     const newService = {
       description,
-      amount,
-      id: generateUniqueId()
+      amount: numericAmount,
+      id: generateUniqueId(),
     };
 
     setValue("services", [...services, newService], {
@@ -44,9 +46,8 @@ export default function CardServices({
     });
 
     setDescription("");
-    setAmount(0);
+    setAmount("");
   };
-
 
   return (
     <Card className="flex gap-2">
@@ -74,9 +75,12 @@ export default function CardServices({
             <InputGroup>
               <InputGroupInput
                 id="service-amount"
+                type="number"
+                min={0}
+                step="0.01"
                 placeholder="0.00"
-                value={amount || ""}
-                onChange={(e) => setAmount(Number(e.target.value))}
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
               />
               <InputGroupAddon>
                 <InputGroupText>Bs.</InputGroupText>
@@ -84,12 +88,16 @@ export default function CardServices({
             </InputGroup>
           </Field>
 
-          <Button type="button" onClick={addService} className="h-10 sm:self-end">
+          <Button
+            type="button"
+            onClick={addService}
+            className="h-10 sm:self-end"
+          >
             <Plus className="h-4 w-4" />
             Agregar
           </Button>
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

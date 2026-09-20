@@ -20,9 +20,8 @@ const saleColumnSchema = z.object({
   totalAmount: z.number(),
   transactions: z.array(transactionSchema),
   status: z.enum(["registered", "cancelled"]),
+  detail: z.string(),
   createdAt: z.string(),
-  itemsCount: z.number(),
-  servicesCount: z.number(),
 });
 
 const salesSchema = z.array(saleColumnSchema);

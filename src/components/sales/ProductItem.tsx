@@ -59,7 +59,7 @@ export default function ProductItem({ product, items, setValue }: Props) {
                 src={product.image}
                 alt={product.description}
                 loading="lazy"
-                className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
+                className="h-full w-full object-contain transition-transform duration-300 hover:scale-105"
               />
             ) : (
               <div className="h-full w-full flex items-center justify-center">

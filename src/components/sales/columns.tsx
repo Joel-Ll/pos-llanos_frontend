@@ -55,18 +55,17 @@ export const columns: ColumnDef<SaleComun>[] = [
       );
     },
   },
+  // Detail
   {
-    accessorKey: "itemsCount",
-    header: "Items",
+    accessorKey: "detail",
+    header: "Detalle",
     cell: ({ row }) => (
-      <div className="flex flex-col">
-        <span className="text-xs text-muted-foreground">
-          Productos: {row.original.itemsCount}
-        </span>
-        <span className="text-xs text-muted-foreground">
-          Servicios: {row.original.servicesCount}
-        </span>
-      </div>
+      <p
+        className="font-normal text-xs leading-tight truncate"
+        title={row.original.detail}
+      >
+        {row.original.detail}
+      </p>
     ),
   },
 

@@ -58,7 +58,6 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { filterWithCategoryAction } from "@/actions/products/filter-with-category.action";
 import { registerSaleAction } from "@/actions/sales/create-sale.action";
-import { generateQuotationAction } from "@/actions/reports/quotation-report.action";
 
 import { type Client } from "@/types/clients/clients.type";
 import type { CashOpen } from "@/types/cash-register/cash-register.type";
@@ -73,7 +72,6 @@ import {
   Banknote,
   ChevronDown,
   CreditCard,
-  FileDownIcon,
   ListCheck,
   Package,
   Printer,
@@ -120,6 +118,7 @@ export default function SalesForm({ cashRegOpen }: Props) {
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [tab, setTab] = useState("detail-sale");
+  const [tabSale, setTabSale] = useState("products");
 
   const [clientType, setClientType] = useState<ClientType>("quick");
   const [saleData, setSaleData] = useState<Sale | undefined>(undefined);
@@ -332,17 +331,8 @@ export default function SalesForm({ cashRegOpen }: Props) {
       queryClient.invalidateQueries({ queryKey: ["products-catalog"] });
       setSaleData(sale);
       setOpenSuccess(true);
+      setTabSale("products");
       handleRemoveSale();
-    },
-  });
-
-  const { mutate: mutatedQuotation, isPending } = useMutation({
-    mutationFn: generateQuotationAction,
-    onError: (error: TypeError) => {
-      toast.error(error.message);
-    },
-    onSuccess: () => {
-      toast.success("Se descargó correctamente");
     },
   });
 
@@ -357,17 +347,6 @@ export default function SalesForm({ cashRegOpen }: Props) {
       },
     });
 
-  const handleQuotation = () => {
-    const data = {
-      client: form.getValues("client"),
-      items: form.getValues("items"),
-      services: form.getValues("services"),
-      globalDiscount: form.getValues("globalDiscount"),
-      totalAmount: form.getValues("totalAmount"),
-    };
-    mutatedQuotation(data);
-  };
-
   const onSubmit = (formData: SalesFormValues) => {
     mutate(formData);
   };
@@ -381,7 +360,11 @@ export default function SalesForm({ cashRegOpen }: Props) {
         onSubmit={form.handleSubmit(onSubmit)}
         className="grid grid-cols-1 lg:grid-cols-12 gap-5"
       >
-        <Tabs defaultValue="products" className="lg:col-span-8">
+        <Tabs
+          value={tabSale}
+          onValueChange={setTabSale}
+          className="lg:col-span-8"
+        >
           <TabsList variant="line">
             <TabsTrigger value="products">Productos</TabsTrigger>
             <TabsTrigger value="services">Servicios</TabsTrigger>
@@ -635,15 +618,17 @@ export default function SalesForm({ cashRegOpen }: Props) {
                     globalDiscount={globalDiscount}
                     totalAmount={totalAmount}
                   >
-                    <Button
-                      type="button"
-                      className="w-full mt-2"
-                      onClick={() => setTab("client")}
-                      size={"lg"}
-                    >
-                      Continuar
-                      <ArrowRight className="h-4 w-4 ml-1" />
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        className="flex-1"
+                        onClick={() => setTab("client")}
+                        size={"lg"}
+                      >
+                        Continuar
+                        <ArrowRight className="h-4 w-4 ml-1" />
+                      </Button>
+                    </div>
                   </SaleSummary>
                 </>
               )}
@@ -837,26 +822,6 @@ export default function SalesForm({ cashRegOpen }: Props) {
                   <Button
                     type="button"
                     className="flex-1"
-                    disabled={isPending}
-                    size={"lg"}
-                    onClick={() => handleQuotation()}
-                  >
-                    {isPending ? (
-                      <>
-                        <Spinner data-icon="inline-start" />
-                        Cargando...
-                      </>
-                    ) : (
-                      <>
-                        Cotizar
-                        <FileDownIcon />
-                      </>
-                    )}
-                  </Button>
-
-                  <Button
-                    type="button"
-                    className="flex-1"
                     size={"lg"}
                     onClick={() => setTab("payment")}
                   >
@@ -1001,7 +966,7 @@ export default function SalesForm({ cashRegOpen }: Props) {
                   className="w-full"
                   size={"lg"}
                 >
-                  {isPending ? (
+                  {isPendingSale ? (
                     <>
                       <Spinner data-icon="inline-start" />
                       Procesando venta...
@@ -1042,7 +1007,7 @@ export default function SalesForm({ cashRegOpen }: Props) {
               disabled={isPendingPrinter}
               onClick={() => mutatedPrinterTicked(saleData!)}
             >
-              {isPending ? (
+              {isPendingPrinter ? (
                 <>
                   <Spinner data-icon="inline-start" />
                   Imprimiendo...

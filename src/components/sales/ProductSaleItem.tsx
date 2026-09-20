@@ -1,33 +1,35 @@
 import type { UseFormSetValue } from "react-hook-form";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import type { SalesFormValues } from "@/types/sales/sales.type";
 import { formatCurrency } from "@/utils";
 import { Minus, Plus, Trash2 } from "lucide-react";
 
 interface Props {
-  items: SalesFormValues['items'];
-  item: SalesFormValues['items'][0];
-  setValue: UseFormSetValue<SalesFormValues>
+  items: SalesFormValues["items"];
+  item: SalesFormValues["items"][0];
+  setValue: UseFormSetValue<SalesFormValues>;
 }
 
 export default function ProductSaleItem({ item, items, setValue }: Props) {
-
   const updateItem = (
     productId: string,
     field: keyof SalesFormValues["items"][0],
     value: number
   ) => {
-    const updated = items.map(item => {
-      if (item.productId !== productId)
-        return item;
+    const updated = items.map((item) => {
+      if (item.productId !== productId) return item;
       const updatedItem = {
         ...item,
-        [field]: value
-      }
+        [field]: value,
+      };
 
-      updatedItem.subtotal =
-        updatedItem.quantity * updatedItem.unitPrice;
+      updatedItem.subtotal = updatedItem.quantity * updatedItem.unitPrice;
 
       return updatedItem;
     });
@@ -36,16 +38,14 @@ export default function ProductSaleItem({ item, items, setValue }: Props) {
   };
 
   const removeItem = (productId: string) => {
-    const updated = items.filter(item => item.productId !== productId);
+    const updated = items.filter((item) => item.productId !== productId);
     setValue("items", updated);
   };
 
   return (
     <div className="flex flex-col gap-4 py-4  md:grid md:grid-cols-12 md:items-center">
-
       {/* Información */}
       <div className="md:col-span-6 flex items-start gap-3 min-w-0">
-
         <div className="min-w-0 flex-1">
           <TooltipProvider>
             <Tooltip>
@@ -55,9 +55,7 @@ export default function ProductSaleItem({ item, items, setValue }: Props) {
                 </p>
               </TooltipTrigger>
 
-              <TooltipContent>
-                {item.description}
-              </TooltipContent>
+              <TooltipContent>{item.description}</TooltipContent>
             </Tooltip>
           </TooltipProvider>
 
@@ -74,7 +72,6 @@ export default function ProductSaleItem({ item, items, setValue }: Props) {
       {/* Cantidad */}
       <div className="md:col-span-3 flex justify-start md:justify-center">
         <div className="flex h-10 items-center overflow-hidden rounded-md border">
-
           <Button
             type="button"
             variant="ghost"
@@ -103,15 +100,12 @@ export default function ProductSaleItem({ item, items, setValue }: Props) {
           >
             <Plus className="h-4 w-4" />
           </Button>
-
         </div>
-
       </div>
 
       {/* Subtotal */}
       <div className="md:col-span-3 flex items-center justify-between md:justify-end gap-3">
-
-        <span className="text-base font-semibold whitespace-nowrap">
+        <span className="text-sm font-semibold whitespace-nowrap">
           Bs {formatCurrency(item.subtotal)}
         </span>
 
@@ -126,5 +120,5 @@ export default function ProductSaleItem({ item, items, setValue }: Props) {
         </Button>
       </div>
     </div>
-  )
+  );
 }

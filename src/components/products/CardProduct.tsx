@@ -31,7 +31,7 @@ export default function CardProduct({ product, openView, setOpenView }: Props) {
                   <img
                     src={product.image}
                     alt={product.description}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-contain"
                     loading="lazy"
                   />
                   {/* Máscara oscura con gradiente */}
@@ -64,7 +64,8 @@ export default function CardProduct({ product, openView, setOpenView }: Props) {
                     <p className="text-sm text-white/90 drop-shadow-md">
                       Código:{" "}
                       <span className="font-mono font-semibold">
-                        {product.internalCode}
+                        #{product.internalCode} •{" "}
+                        {product.catalogCode ? product.catalogCode : "s/n"}
                       </span>
                     </p>
                   </div>
