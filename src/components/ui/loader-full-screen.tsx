@@ -35,7 +35,7 @@ export function FullScreenLoader({
   // Crear portal en el body (fuera de cualquier stacking context)
   return createPortal(
     <div
-      className="fixed inset-0 z-[2147483647] bg-black/70 flex flex-col items-center justify-center gap-3"
+      className="fixed inset-0 z-2147483647 bg-black/70 flex flex-col items-center justify-center gap-3"
       aria-busy="true"
       aria-live="assertive"
     >
